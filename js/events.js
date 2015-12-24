@@ -19,7 +19,8 @@ addEventListener("DOMContentLoaded", function () {
             $.ajax({
                 url: form.action,
                 method: form.method,
-                data: data
+                data: data,
+                cache:false 
             }).done(function (data) {
                 console.log("in done");
                 console.log(data);
@@ -30,5 +31,19 @@ addEventListener("DOMContentLoaded", function () {
             e.preventDefault();
         });
 
+    });
+    $('.js-save-button').on('click',function(){
+        console.log("click button");
+        $.ajax({
+            url: 'graph/',
+            method: 'PUT',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(combineGraph(global.graph))
+        }).done(function (data) {
+            console.log(data);
+        }).error(function () {
+            console.log("error");
+        });
     });
 });

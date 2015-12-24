@@ -19,7 +19,8 @@ addEventListener("DOMContentLoaded", function () {
             $.ajax({
                 url: form.action,
                 method: form.method,
-                data: data
+                data: data,
+                cache:false 
             }).done(function (data) {
                 console.log("in done");
                 console.log(data);
@@ -31,33 +32,22 @@ addEventListener("DOMContentLoaded", function () {
         });
 
     });
+    $('.js-save-button').on('click',function(){
+        console.log("click button");
+        $.ajax({
+            url: 'graph/',
+            method: 'PUT',
+            dataType: 'json',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify(combineGraph(global.graph))
+        }).done(function (data) {
+            console.log(data);
+        }).error(function () {
+            console.log("error");
+        });
+    });
 });
 
-/**
- * User: Vitalik Kotliar
- * Email: 7vetaly7@ukr.net
- * Date: 23.12.15
- */
-
-function getCenterLine(x1, x2) {
-    return Math.round((x1 + x2) / 2);
-}
-
-function getGraphJson() {
-    var json = {};
-    $.ajax({
-        url: '/graph',
-        method: 'GET',
-        async:false
-    }).done(function (data) {
-        console.log(json);
-        json = data;
-    }).error(function () {
-        console.log("error");
-    });
-    console.log(json);
-    return json;
-}
 /**
  * User: Vitalik Kotliar
  * Email: 7vetaly7@ukr.net
@@ -91,18 +81,18 @@ function renderGraph(jsonGraph) {
 
     var color = d3.scale.category20();
 
-    var graph = jsonGraph || getGraphJson();
-    console.log("in render = ",graph);
-    global.force
-        .nodes(graph.nodes)
-        .links(graph.links)
+    global.graph = jsonGraph || getGraphJson();
+    console.log("in render = ",global.graph);
+        global.force
+        .nodes(global.graph.nodes)
+        .links(global.graph.links)
         .start();
 
     //create links
     //логично сначала прорисовать ноды потом линки,
     // но ноды дожны быть выше в дом дереве что бы они показывались выше ликов
     var linksWrapper = global.svg.selectAll(".link")
-        .data(graph.links)
+        .data(global.graph.links)
         .enter().append("g");
 
     var linkLine = linksWrapper
@@ -123,7 +113,7 @@ function renderGraph(jsonGraph) {
 
     //добавляем g куда будем ложить саму точку и текст
     var nodesWrapper = global.svg.selectAll(".node")
-        .data(graph.nodes)
+        .data(global.graph.nodes)
         .enter().append("g")
         .style("fill", function (d) {
             return color(d.group);
@@ -186,3 +176,48 @@ addEventListener("DOMContentLoaded", function () {
     initWindow();
     renderGraph();
 });
+/**
+ * User: Vitalik Kotliar
+ * Email: 7vetaly7@ukr.net
+ * Date: 23.12.15
+ */
+
+function getCenterLine(x1, x2) {
+    return Math.round((x1 + x2) / 2);
+}
+
+function getGraphJson() {
+    var json = {};
+    $.ajax({
+        url: '/graph',
+        method: 'POST',
+        async:false
+    }).done(function (data) {
+        console.log(json);
+        json = data;
+    }).error(function () {
+        console.log("error");
+    });
+    console.log(json);
+    return json;
+}
+
+function clone(obj){
+    if(obj == null || typeof(obj) != 'object')
+        return obj;
+    var temp = new obj.constructor();
+    for(var key in obj)
+        temp[key] = clone(obj[key]);
+    return temp;
+}
+
+function combineGraph(graph){
+    //перед отправкрй нужно преобразовать json, в ребрах заменить ноуд, с  объекта этой ноды целиком на ее индекс
+    //  делаем через функцию клонирования, ато задевает текущую конфигурацию графа
+    var tmpGraph = clone(graph);
+    for (var i=0; i < tmpGraph.links.length;i++){
+        tmpGraph.links[i].target = tmpGraph.links[i].target.index;
+        tmpGraph.links[i].source = parseInt(tmpGraph.links[i].source.index);
+    }
+    return tmpGraph;
+};

@@ -1,4 +1,4 @@
-var myFunctions = require('./function');
+var myFunctions = require('./service');
 var express = require('express');
 var app = express();
 var path = require('path');
@@ -34,12 +34,29 @@ app.get('/*.css', function (req, res) {
  * GET GRAPH JSON
  */
 
-app.get('/graph', function (req, res) {
+app.post('/graph', function (req, res) {
     console.log("get request graph json");
     jsonfile.readFile(pathJsonFile, function (err, obj) {
         if (err) res.statusCode = 200;
         res.send(obj);
     });
+});
+
+/**
+ * PUT GRAPH JSON
+ */
+
+app.put('/graph', function (req, res) {
+    console.log("put graph");
+    var graph = req.body;
+    console.log(typeof graph);
+    jsonfile.writeFile(pathJsonFile, graph, function (err) {
+        if (err) res.statusCode = 404;
+        //возвращаем на клиет весь джсон
+        res.send('success');
+        res.statusCode = 200;
+    });
+
 });
 
 /**
@@ -88,7 +105,7 @@ app.post('/remove/node', function (req, res) {
     console.log("post request remove node");
 
     var idNode = req.body.idNode;
-    console.log(idNode);
+
     jsonfile.readFile(pathJsonFile, function (err, obj) {
         if (err) res.statusCode = 404;
         var json = obj;
@@ -96,8 +113,8 @@ app.post('/remove/node', function (req, res) {
         var numberNode = global.getNumberNodeById(json.nodes, idNode);
 
         if (numberNode != -1) {
-            //json.nodes.splice(numberNode, 1); //delete node from array
-            json.nodes[numberNode] = {"fixed":true};
+            json.nodes.splice(numberNode, 1); //delete node from array
+            //json.nodes[numberNode] = {"fixed":true};
             // remove all link with this node
             for (var i = 0; i < json.links.length; i++) {
                 console.log("in for");

@@ -31,18 +31,18 @@ function renderGraph(jsonGraph) {
 
     var color = d3.scale.category20();
 
-    var graph = jsonGraph || getGraphJson();
-    console.log("in render = ",graph);
-    global.force
-        .nodes(graph.nodes)
-        .links(graph.links)
+    global.graph = jsonGraph || getGraphJson();
+    console.log("in render = ",global.graph);
+        global.force
+        .nodes(global.graph.nodes)
+        .links(global.graph.links)
         .start();
 
     //create links
     //логично сначала прорисовать ноды потом линки,
     // но ноды дожны быть выше в дом дереве что бы они показывались выше ликов
     var linksWrapper = global.svg.selectAll(".link")
-        .data(graph.links)
+        .data(global.graph.links)
         .enter().append("g");
 
     var linkLine = linksWrapper
@@ -63,7 +63,7 @@ function renderGraph(jsonGraph) {
 
     //добавляем g куда будем ложить саму точку и текст
     var nodesWrapper = global.svg.selectAll(".node")
-        .data(graph.nodes)
+        .data(global.graph.nodes)
         .enter().append("g")
         .style("fill", function (d) {
             return color(d.group);
