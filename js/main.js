@@ -5,13 +5,13 @@
  */
 
 var global = {
-    setting:{
-        radiusNode:15
+    setting: {
+        radiusNode: 15
     }
 };
 
 
-function initWindow(){
+function initWindow() {
     var height = window.innerHeight;
     var width = window.innerWidth;
 
@@ -26,101 +26,99 @@ function initWindow(){
         .attr("height", height);
 };
 
-function renderGraph(){
+function renderGraph(jsonGraph) {
+    global.svg.html("");
+
     var color = d3.scale.category20();
 
+    var graph = jsonGraph || getGraphJson();
+    console.log("in render = ",graph);
+    global.force
+        .nodes(graph.nodes)
+        .links(graph.links)
+        .start();
 
-    d3.json("js/miserables.json", function (error, graph) {
-        if (error) throw error;
+    //create links
+    //логично сначала прорисовать ноды потом линки,
+    // но ноды дожны быть выше в дом дереве что бы они показывались выше ликов
+    var linksWrapper = global.svg.selectAll(".link")
+        .data(graph.links)
+        .enter().append("g");
 
-        global.force
-            .nodes(graph.nodes)
-            .links(graph.links)
-            .start();
+    var linkLine = linksWrapper
+        .append('line')
+        .attr("class", "link-line")
+        .style("stroke-width", function (d) {
+            return Math.sqrt(d.weight);
+        });
 
-        //create links
-        //логично сначала прорисовать ноды потом линки,
-        // но ноды дожны быть выше в дом дереве что бы они показывались выше ликов
-        var linksWrapper = global.svg.selectAll(".link")
-            .data(graph.links)
-            .enter().append("g");
+    //append element text in each linkWrapper
+    var linkText = linksWrapper
+        .append('text')
+        .html(function (d) {
+            return d.weight; //get from current object link, that we take from json
+        })
+        .attr("class", "link-text");
 
-        var linkLine = linksWrapper
-            .append('line')
-            .attr("class", "link-line")
-            .style("stroke-width", function (d) {
-                return Math.sqrt(d.weight);
+
+    //добавляем g куда будем ложить саму точку и текст
+    var nodesWrapper = global.svg.selectAll(".node")
+        .data(graph.nodes)
+        .enter().append("g")
+        .style("fill", function (d) {
+            return color(d.group);
+        })
+        .call(global.force.drag);
+
+    var nodeCircle = nodesWrapper
+        .append('circle')
+        .attr("class", "node-circle")
+        .attr("r", global.setting.radiusNode);
+
+    //append element text in each nodeWrapper
+    var nodeText = nodesWrapper
+        .append('text')
+        .html(function (d) {
+            return d.name; //get from current object node, that we take from json
+        })
+        .attr("class", "node-text");
+
+    //в функции выполняется просчет кординат, спецефична и обязательно для бибилотеки d3
+    global.force.on("tick", function () {
+        linkLine.attr("x1", function (d) {
+                return d.source.x;
+            })
+            .attr("y1", function (d) {
+                return d.source.y;
+            })
+            .attr("x2", function (d) {
+                return d.target.x;
+            })
+            .attr("y2", function (d) {
+                return d.target.y;
             });
 
-        //append element text in each linkWrapper
-        var linkText = linksWrapper
-            .append('text')
-            .html(function(d){
-                return d.weight; //get from current object link, that we take from json
+        linkText.attr('x', function (d) {
+                return getCenterLine(d.source.px, d.target.px);
             })
-            .attr("class", "link-text");
+            .attr('y', function (d) {
+                return getCenterLine(d.source.py, d.target.py);
+            });
 
-
-        //добавляем g куда будем ложить саму точку и текст
-        var nodesWrapper = global.svg.selectAll(".node")
-            .data(graph.nodes)
-            .enter().append("g")
-            .style("fill", function (d) {
-                return color(d.group);
+        nodeCircle.attr("cx", function (d) {
+                return d.x;
             })
-            .call(global.force.drag);
-
-        var nodeCircle = nodesWrapper
-            .append('circle')
-            .attr("class", "node-circle")
-            .attr("r", global.setting.radiusNode);
-
-        //append element text in each nodeWrapper
-        var nodeText = nodesWrapper
-            .append('text')
-            .html(function(d){
-                return d.name; //get from current object node, that we take from json
+            .attr("cy", function (d) {
+                return d.y;
+            });
+        nodeText
+            .attr("x", function (d) {
+                var halfWeight = d3.select(this).node().getBBox().width / 2;
+                return (d.x - halfWeight);
             })
-            .attr("class", "node-text");
-
-        //в функции выполняется просчет кординат, спецефична и обязательно для бибилотеки d3
-        global.force.on("tick", function () {
-            linkLine.attr("x1", function (d) {
-                    return d.source.x;
-                })
-                .attr("y1", function (d) {
-                    return d.source.y;
-                })
-                .attr("x2", function (d) {
-                    return d.target.x;
-                })
-                .attr("y2", function (d) {
-                    return d.target.y;
-                });
-
-            linkText.attr('x', function (d) {
-                    return getCenterLine(d.source.px,d.target.px);
-                })
-                .attr('y', function (d) {
-                    return getCenterLine(d.source.py,d.target.py);
-                });
-
-            nodeCircle.attr("cx", function (d) {
-                    return d.x;
-                })
-                .attr("cy", function (d) {
-                    return d.y;
-                });
-            nodeText
-                .attr("x", function (d) {
-                    var halfWeight = d3.select(this).node().getBBox().width / 2;
-                    return (d.x - halfWeight);
-                })
-                .attr("y", function (d) {
-                    return d.y + 7;
-                });
-
-        });
+            .attr("y", function (d) {
+                return d.y + 7;
+            });
     });
 };
 

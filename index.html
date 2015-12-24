@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
 
+<!--browser-sync start --server --files "css/*.css, js/dest/*.js"-->
+
+
 <script src="node_modules/d3/d3.js"></script>
+<script src="js/dest/jquery-1.11.3.min.js"></script>
 <script src="js/dest/scripts.js"></script>
 <link rel="stylesheet" href="css/main.css">
 <body>
@@ -11,10 +15,20 @@
 
 <div class="wr-menu">
     <div class="item-menu">
-        <form action="add/node">
+        <form method="POST"  action="add/node">
             Добавление вершины
             <br>
             <button type="submit">Добавить</button>
+        </form>
+    </div>
+    <div class="item-menu">
+        <form method="POST"  action="remove/node">
+            Удаление вершины
+            <br>
+            Введите номер:
+            <input type="text" name="idNode">
+            <br>
+            <button type="submit">Удалить</button>
         </form>
     </div>
 </div>
