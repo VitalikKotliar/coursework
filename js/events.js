@@ -53,4 +53,21 @@ addEventListener("DOMContentLoaded", function () {
         renderGraph(graph);
         saveGraphOnSever();
     });
+    $('.js-file-graph').on('change',function(e){
+        e.preventDefault();
+        e.stopPropagation();
+
+        var $this = $(this);
+        $.ajax({
+            url: '/file',
+            method: 'post',
+            data: {'file-graph' : this.value},
+            cache: false
+        }).done(function (data) {
+            console.log("in done");
+            renderGraph();
+        }).error(function () {
+            console.log("error");
+        });
+    });
 });

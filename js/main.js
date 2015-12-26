@@ -5,6 +5,7 @@
  */
 
 var global = {
+    templates: {},
     setting: {
         radiusNode: 15
     }
@@ -32,8 +33,8 @@ function renderGraph(jsonGraph) {
     var color = d3.scale.category20();
 
     global.graph = jsonGraph || getGraphJson();
-    console.log("in render = ",global.graph);
-        global.force
+    console.log("in render = ", global.graph);
+    global.force
         .nodes(global.graph.nodes)
         .links(global.graph.links)
         .start();
@@ -122,7 +123,30 @@ function renderGraph(jsonGraph) {
     });
 };
 
+function initMenu() {
+    var $selectFiles = $('.js-file-graph');
+    var field = global.templates["js-template-select"]({data: getListFile()});
+    console.log(field);
+    $selectFiles.append(field);
+}
 addEventListener("DOMContentLoaded", function () {
+
+    /**
+     *
+     * TEMPLATES COMPILING
+     */
+
+    var $templates = $('.js-templates');
+
+    Array.prototype.map.call($templates, function (elem) {
+        var source = $(elem).html();
+        global.templates[elem.id] = Handlebars.compile(source);
+    });
+
+    /**
+     * INIT D3
+     */
+    initMenu();
     initWindow();
     renderGraph();
 });

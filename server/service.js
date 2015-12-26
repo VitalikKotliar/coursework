@@ -4,102 +4,9 @@
  * Date: 24.12.15
  */
 
-/*
- передаем массив нодов
- */
-var nodesArray = [
-    {
-        "name": "1",
-        "group": 1,
-        "fixed": true,
-        "x": 30,
-        "y": 100
-    },
-    {
-        "name": "2",
-        "group": 1,
-        "fixed": true,
-        "x": 30,
-        "y": 200
-    },
-    {
-        "name": "3",
-        "group": 1,
-        "fixed": true,
-        "x": 30,
-        "y": 300
-    },
-    {
-        "name": "4",
-        "group": 1,
-        "fixed": true,
-        "x": 30,
-        "y": 400
-    },
-    {
-        "name": 4,
-        "group": 1,
-        "fixed": true,
-        "x": 60,
-        "y": 60
-    },
-    {
-        "name": 5,
-        "group": 1,
-        "fixed": true,
-        "x": 60,
-        "y": 60
-    },
-    {
-        "name": 6,
-        "group": 1,
-        "fixed": true,
-        "x": 60,
-        "y": 60
-    },
-    {
-        "name": 7,
-        "group": 1,
-        "fixed": true,
-        "x": 60,
-        "y": 60
-    },
-    {
-        "name": 8,
-        "group": 1,
-        "fixed": true,
-        "x": 60,
-        "y": 60
-    },
-    {
-        "name": 9,
-        "group": 1,
-        "fixed": true,
-        "x": 60,
-        "y": 60
-    },
-    {
-        "name": 10,
-        "group": 1,
-        "fixed": true,
-        "x": 60,
-        "y": 60
-    },
-    {
-        "name": 11,
-        "group": 1,
-        "fixed": true,
-        "x": 60,
-        "y": 60
-    },
-    {
-        "name": 12,
-        "group": 1,
-        "fixed": true,
-        "x": 60,
-        "y": 60
-    }
-];
+var fs = require('fs');
+var path = require('path');
+
 
 global.getNumberNodeById = function (json, id) {
     var length = json.length;
@@ -109,4 +16,17 @@ global.getNumberNodeById = function (json, id) {
             result = i;
     };
     return result;
+};
+
+global.getFileNameInDirectory = function (dirPath) {
+    var files = [];
+    var fileType = '.' + 'json';
+    fs.readdir(dirPath, function (err, list) {
+        if (err) throw err;
+        for (var i = 0; i < list.length; i++)
+            if (path.extname(list[i]) === fileType) {
+                files.push(list[i]); //store the file name into the array files
+            }
+        global.fileNameData = files;
+    });
 };

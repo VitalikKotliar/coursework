@@ -53,6 +53,23 @@ addEventListener("DOMContentLoaded", function () {
         renderGraph(graph);
         saveGraphOnSever();
     });
+    $('.js-file-graph').on('change',function(e){
+        e.preventDefault();
+        e.stopPropagation();
+
+        var $this = $(this);
+        $.ajax({
+            url: '/file',
+            method: 'post',
+            data: {'file-graph' : this.value},
+            cache: false
+        }).done(function (data) {
+            console.log("in done");
+            renderGraph();
+        }).error(function () {
+            console.log("error");
+        });
+    });
 });
 
 /**
@@ -62,6 +79,7 @@ addEventListener("DOMContentLoaded", function () {
  */
 
 var global = {
+    templates: {},
     setting: {
         radiusNode: 15
     }
@@ -89,8 +107,8 @@ function renderGraph(jsonGraph) {
     var color = d3.scale.category20();
 
     global.graph = jsonGraph || getGraphJson();
-    console.log("in render = ",global.graph);
-        global.force
+    console.log("in render = ", global.graph);
+    global.force
         .nodes(global.graph.nodes)
         .links(global.graph.links)
         .start();
@@ -179,7 +197,30 @@ function renderGraph(jsonGraph) {
     });
 };
 
+function initMenu() {
+    var $selectFiles = $('.js-file-graph');
+    var field = global.templates["js-template-select"]({data: getListFile()});
+    console.log(field);
+    $selectFiles.append(field);
+}
 addEventListener("DOMContentLoaded", function () {
+
+    /**
+     *
+     * TEMPLATES COMPILING
+     */
+
+    var $templates = $('.js-templates');
+
+    Array.prototype.map.call($templates, function (elem) {
+        var source = $(elem).html();
+        global.templates[elem.id] = Handlebars.compile(source);
+    });
+
+    /**
+     * INIT D3
+     */
+    initMenu();
     initWindow();
     renderGraph();
 });
@@ -266,3 +307,20 @@ function getNumberNodeByName(json, id) {
     return result;
 };
 
+/**
+ * MENU FILES
+ */
+
+function getListFile() {
+    var listFiles = [];
+    $.ajax({
+        url: '/files',
+        method: 'get',
+        async:false
+    }).done(function (data) {
+        listFiles = data;
+    }).error(function () {
+        console.log("error");
+    });
+    return listFiles;
+}

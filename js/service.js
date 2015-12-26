@@ -81,3 +81,20 @@ function getNumberNodeByName(json, id) {
     return result;
 };
 
+/**
+ * MENU FILES
+ */
+
+function getListFile() {
+    var listFiles = [];
+    $.ajax({
+        url: '/files',
+        method: 'get',
+        async:false
+    }).done(function (data) {
+        listFiles = data;
+    }).error(function () {
+        console.log("error");
+    });
+    return listFiles;
+}

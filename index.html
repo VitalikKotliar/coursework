@@ -6,12 +6,19 @@
 
 <script src="node_modules/d3/d3.js"></script>
 <script src="js/dest/jquery-1.11.3.min.js"></script>
+<script src="js/dest/handlebars-v4.0.5.js"></script>
 <script src="js/dest/scripts.js"></script>
 <link rel="stylesheet" href="css/main.css">
 <body>
 <svg>
     <!--fill for build graph-->
 </svg>
+
+
+<script class="js-templates" id="js-template-select" type="text/x-handlebars-template">
+    {{#each data}}
+    <option value="{{this}}">{{this}}</option>{{/each}}
+</script>
 
 <div class="wr-menu">
     <div class="item-menu">
@@ -34,16 +41,9 @@
     <div class="item-menu">
         <button class="js-save">Сохранить расположение точек</button>
     </div>
-    <!--<div class="item-menu">-->
-        <!--<form method="post" action="/file">-->
-            <!--<select name="file-graph" class="js-file-graph">-->
-                <!--<option value="1">Файл 1</option>-->
-                <!--<option value="2">Файл 2</option>-->
-                <!--<option value="3">Файл 3</option>-->
-                <!--<option value="4">Файл 4</option>-->
-            <!--</select>-->
-            <!--<button type="submit">Применить</button>-->
-        <!--</form>-->
-    <!--</div>-->
+    <div class="item-menu">
+        Выберете файл <br>
+        <select name="file-graph" class="js-file-graph"></select>
+    </div>
 </div>
 </body>
