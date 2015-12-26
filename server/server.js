@@ -1,13 +1,15 @@
 var myFunctions = require('./service');
-var express = require('express');
-var app = express();
-var path = require('path');
-var port = 8080;
-var fs = require('fs');
-var rootProject = "/home/vitalik/Projects/course_work_my/"; //TODO найти лучшее решение
-var pathJsonFile = path.join(rootProject + '/server/graph.json');
-var jsonfile = require('jsonfile'); // for usability read and write file
-var bodyParser = require('body-parser');
+    express = require('express'),
+    app = express(),
+    path = require('path'),
+    port = 8080,
+    fs = require('fs'),
+    rootProject = "/home/vitalik/Projects/course_work_my/", //TODO найти лучшее решение
+    pathJsonFile = path.join(rootProject + '/server/data/graph.json'),
+    jsonfile = require('jsonfile'), // for usability read and write file
+    bodyParser = require('body-parser');
+
+
 
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -34,7 +36,7 @@ app.get('/*.css', function (req, res) {
  * GET GRAPH JSON
  */
 
-app.post('/graph', function (req, res) {
+app.get('/graph', function (req, res) {
     console.log("get request graph json");
     jsonfile.readFile(pathJsonFile, function (err, obj) {
         if (err) res.statusCode = 200;
@@ -51,9 +53,8 @@ app.put('/graph', function (req, res) {
     var graph = req.body;
     console.log(typeof graph);
     jsonfile.writeFile(pathJsonFile, graph, function (err) {
+        console.log(err);
         if (err) res.statusCode = 404;
-        //возвращаем на клиет весь джсон
-        res.send('success');
         res.statusCode = 200;
     });
 
@@ -139,6 +140,13 @@ app.post('/remove/node', function (req, res) {
 /**
  * CRUD end
  */
+//
+//app.post('/file', function (req, res) {
+//    console.log(req.body);
+//    res.statusCode = 200;
+//    res.send("sdfasdf");
+//});
+
 
 app.listen(port);
 

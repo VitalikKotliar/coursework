@@ -5,46 +5,53 @@
  */
 addEventListener("DOMContentLoaded", function () {
 
-    var forms = document.getElementsByTagName('form');
-
-    Array.prototype.map.call(forms, function (form) {
+    var $forms = $('.js-simple-form');
 
 
-        form.addEventListener("submit", function (e) {
-            var $this = $(this);
-            console.log("in submint");
-            console.log($this);
-            var data = $this.serialize();
-            console.log(data);
-            $.ajax({
-                url: form.action,
-                method: form.method,
-                data: data,
-                cache:false 
-            }).done(function (data) {
-                console.log("in done");
-                console.log(data);
-                renderGraph(data);
-            }).error(function () {
-                console.log("error");
-            });
-            e.preventDefault();
-        });
+    $forms.on("submit", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
 
-    });
-    $('.js-save-button').on('click',function(){
-        console.log("click button");
+        var $this = $(this);
+
         $.ajax({
-            url: 'graph/',
-            method: 'PUT',
-            dataType: 'json',
-            contentType: 'application/json; charset=utf-8',
-            data: JSON.stringify(combineGraph(global.graph))
+            url: this.action,
+            method: this.method,
+            data: $this.serialize(),
+            cache: false
         }).done(function (data) {
-            console.log(data);
+            renderGraph(data);
         }).error(function () {
             console.log("error");
         });
+    });
+
+    $('.js-save').on('click', function () {
+        saveGraphOnSever();
+    });
+
+    $('.js-remove-node').on('click', function (e) {
+        e.stopPropagation();
+        e.preventDefault();
+
+
+        var graph = global.graph,
+            nameNode = $(this).closest('form').find('input').val(),
+            numberNode = getNumberNodeByName(graph.nodes, nameNode);
+
+        if (numberNode != -1) {
+            graph.nodes.splice(numberNode, 1); //delete node from array
+            for (var i = 0; i < graph.links.length; i++) { //delete links that had node
+                if (graph.links[i]['source']['index'] == numberNode
+                    || graph.links[i]['target']['index'] == numberNode) {
+                    graph.links.splice(i, 1);
+                    i--;
+                }
+                else i++;
+            }
+        }
+        renderGraph(graph);
+        saveGraphOnSever();
     });
 });
 
@@ -186,11 +193,17 @@ function getCenterLine(x1, x2) {
     return Math.round((x1 + x2) / 2);
 }
 
+
+/**
+ * FUNCTION WORK WITH API
+ *
+ */
+
 function getGraphJson() {
     var json = {};
     $.ajax({
         url: '/graph',
-        method: 'POST',
+        method: 'get',
         async:false
     }).done(function (data) {
         console.log(json);
@@ -201,6 +214,27 @@ function getGraphJson() {
     console.log(json);
     return json;
 }
+
+function saveGraphOnSever() {
+    $.ajax({
+        url: 'graph/',
+        method: 'PUT',
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(combineGraph(global.graph))
+    }).done(function (data) {
+        console.log(data);
+    }).error(function () {
+        console.log("error");
+    });
+}
+
+
+
+/**
+ *
+ * ADDITIONAL FUNCTION
+ */
 
 function clone(obj){
     if(obj == null || typeof(obj) != 'object')
@@ -221,3 +255,14 @@ function combineGraph(graph){
     }
     return tmpGraph;
 };
+
+function getNumberNodeByName(json, id) {
+    var length = json.length;
+    var result = -1;
+    for (var i = 0; i < length; i++) {
+        if (json[i].name == id)
+            result = i;
+    };
+    return result;
+};
+

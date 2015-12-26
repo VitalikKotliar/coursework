@@ -15,24 +15,35 @@
 
 <div class="wr-menu">
     <div class="item-menu">
-        <form method="POST"  action="add/node">
+        <form method="post" action="add/node" class="js-simple-form">
             Добавление вершины
             <br>
             <button type="submit">Добавить</button>
         </form>
     </div>
     <div class="item-menu">
-        <form method="POST"  action="remove/node">
+        <form>
             Удаление вершины
             <br>
             Введите номер:
             <input type="text" name="idNode">
             <br>
-            <button type="submit">Удалить</button>
+            <button class="js-remove-node">Удалить</button>
         </form>
     </div>
     <div class="item-menu">
-        <button class="js-save-button">Сохранить расположение точек</button>
+        <button class="js-save">Сохранить расположение точек</button>
     </div>
+    <!--<div class="item-menu">-->
+        <!--<form method="post" action="/file">-->
+            <!--<select name="file-graph" class="js-file-graph">-->
+                <!--<option value="1">Файл 1</option>-->
+                <!--<option value="2">Файл 2</option>-->
+                <!--<option value="3">Файл 3</option>-->
+                <!--<option value="4">Файл 4</option>-->
+            <!--</select>-->
+            <!--<button type="submit">Применить</button>-->
+        <!--</form>-->
+    <!--</div>-->
 </div>
 </body>

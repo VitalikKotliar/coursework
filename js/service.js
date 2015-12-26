@@ -8,11 +8,17 @@ function getCenterLine(x1, x2) {
     return Math.round((x1 + x2) / 2);
 }
 
+
+/**
+ * FUNCTION WORK WITH API
+ *
+ */
+
 function getGraphJson() {
     var json = {};
     $.ajax({
         url: '/graph',
-        method: 'POST',
+        method: 'get',
         async:false
     }).done(function (data) {
         console.log(json);
@@ -23,6 +29,27 @@ function getGraphJson() {
     console.log(json);
     return json;
 }
+
+function saveGraphOnSever() {
+    $.ajax({
+        url: 'graph/',
+        method: 'PUT',
+        dataType: 'json',
+        contentType: 'application/json; charset=utf-8',
+        data: JSON.stringify(combineGraph(global.graph))
+    }).done(function (data) {
+        console.log(data);
+    }).error(function () {
+        console.log("error");
+    });
+}
+
+
+
+/**
+ *
+ * ADDITIONAL FUNCTION
+ */
 
 function clone(obj){
     if(obj == null || typeof(obj) != 'object')
@@ -43,3 +70,14 @@ function combineGraph(graph){
     }
     return tmpGraph;
 };
+
+function getNumberNodeByName(json, id) {
+    var length = json.length;
+    var result = -1;
+    for (var i = 0; i < length; i++) {
+        if (json[i].name == id)
+            result = i;
+    };
+    return result;
+};
+
