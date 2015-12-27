@@ -1,0 +1,32 @@
+.wr-notification {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+}
+
+.notification {
+    width: 230px;
+    padding: 15px;
+    margin: 10px 23px;
+    color: #ffffff;
+    -webkit-border-radius: 3px;
+    -moz-border-radius: 3px;
+    border-radius: 3px;
+    opacity: .8;
+}
+
+.notification:hover {
+    cursor: pointer;
+}
+
+.notification.error {
+    background-color: red;
+}
+
+.notification.success {
+    background-color: springgreen;
+}
+
+.notification.info {
+    background-color: black;
+}

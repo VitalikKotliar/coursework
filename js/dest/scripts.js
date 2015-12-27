@@ -7,13 +7,13 @@ addEventListener("DOMContentLoaded", function () {
 
     var $forms = $('.js-simple-form');
 
-
     $forms.on("submit", function (e) {
+        global.backup.addBackup();
+
         e.preventDefault();
         e.stopPropagation();
 
         var $this = $(this);
-
         $.ajax({
             url: this.action,
             method: this.method,
@@ -23,6 +23,7 @@ addEventListener("DOMContentLoaded", function () {
             renderGraph(data);
         }).error(function () {
             console.log("error");
+            notification.create("Ошибка","error");
         });
     });
 
@@ -31,29 +32,20 @@ addEventListener("DOMContentLoaded", function () {
     });
 
     $('.js-remove-node').on('click', function (e) {
+        global.backup.addBackup();
+
         e.stopPropagation();
         e.preventDefault();
 
+        var namesNodes = $(this).closest('form').find('input').val();
 
-        var graph = global.graph,
-            nameNode = $(this).closest('form').find('input').val(),
-            numberNode = getNumberNodeByName(graph.nodes, nameNode);
+        removeNodes(global.graph,namesNodes);
 
-        if (numberNode != -1) {
-            graph.nodes.splice(numberNode, 1); //delete node from array
-            for (var i = 0; i < graph.links.length; i++) { //delete links that had node
-                if (graph.links[i]['source']['index'] == numberNode
-                    || graph.links[i]['target']['index'] == numberNode) {
-                    graph.links.splice(i, 1);
-                    i--;
-                }
-                else i++;
-            }
-        }
-        renderGraph(graph);
         saveGraphOnSever();
     });
-    $('.js-file-graph').on('change',function(e){
+    $('.js-file-graph').on('change', function (e) {
+        global.backup.backupData = [];
+
         e.preventDefault();
         e.stopPropagation();
 
@@ -61,14 +53,26 @@ addEventListener("DOMContentLoaded", function () {
         $.ajax({
             url: '/file',
             method: 'post',
-            data: {'file-graph' : this.value},
+            data: {'file-graph': this.value},
             cache: false
         }).done(function (data) {
-            console.log("in done");
             renderGraph();
         }).error(function () {
             console.log("error");
         });
+    });
+
+    /**
+     * UNDO , REDO
+     */
+
+    $('.js-undo').on('click', function () {
+        global.backup.undo();
+
+    });
+
+    $('.js-redo').on('click', function () {
+        global.backup.redo();
     });
 });
 
@@ -77,11 +81,45 @@ addEventListener("DOMContentLoaded", function () {
  * Email: 7vetaly7@ukr.net
  * Date: 22.05.2015
  */
+var inputData = {
+    weight: [3, 4, 5, 7, 11, 12, 15, 17, 19, 24]
+};
 
 var global = {
     templates: {},
     setting: {
         radiusNode: 15
+    },
+    backup: {
+        backupData: [],
+        currentIndexObj: 0,
+        //TODO сделать более продуманный алгоритм
+        addBackup: function () {
+            //затираем все при добавления бекапа, нужно при добавления новых данных
+            // в середину массива
+            this.backupData.splice(this.currentIndexObj + 1, this.backupData.length);
+            this.currentIndexObj = this.backupData.push(clone(global.graph));
+        },
+        undo: function () {
+            var index = this.currentIndexObj;
+            var backup = this.backupData[index - 1];
+            if (!this.backupData[index + 1]) { //для возможности перехода вперед
+                this.addBackup();
+            }
+            if (backup) {
+                global.graph = backup;
+                renderGraph(saveGraphOnSever());
+                this.currentIndexObj = index - 1;
+            }
+        },
+        redo: function () {
+            var backup = this.backupData[this.currentIndexObj + 1];
+            if (backup) {
+                global.graph = backup;
+                renderGraph(saveGraphOnSever());
+                this.currentIndexObj++;
+            }
+        }
     }
 };
 
@@ -199,9 +237,11 @@ function renderGraph(jsonGraph) {
 
 function initMenu() {
     var $selectFiles = $('.js-file-graph');
-    var field = global.templates["js-template-select"]({data: getListFile()});
-    console.log(field);
-    $selectFiles.append(field);
+    var $selectWeight = $('.js-link-weight');
+
+    $selectFiles.append(global.templates["js-template-select"]({data: getListFile()}));
+    $selectWeight.append(global.templates["js-template-select"]({data: inputData.weight}));
+
 }
 addEventListener("DOMContentLoaded", function () {
 
@@ -224,6 +264,88 @@ addEventListener("DOMContentLoaded", function () {
     initWindow();
     renderGraph();
 });
+/**
+ * User: Vitalik Kotliar
+ * Email: 7vetaly7@ukr.net
+ * Date: 20.12.15
+ */
+
+Object.size = function (obj) {
+    var size = 0, key;
+    for (key in obj) {
+        if (obj.hasOwnProperty(key)) size++;
+    }
+    return size;
+};
+
+Object.min = function (obj) {
+    var keys = Object.keys(obj);
+    keys.map(function (element, i) {
+        keys[i] = parseInt(element);
+    });
+    return Math.min.apply(null, keys);
+};
+
+notification = {
+    notifications: {},
+    counter: 0,
+    create: function (text, type, seconds) {
+        if (Object.size(this.notifications) > 4) {
+            this.remove(Object.min(this.notifications));
+        }
+
+        var newNotification = {};
+        newNotification.node = document.createElement("div");
+        console.log(newNotification.node);
+        newNotification.node.innerText = text || "notification";
+        newNotification.node.className = "notification " + (type || "info");
+
+        newNotification.timeOut = setTimeout(function () {
+            notification.remove(newNotification.id);
+        }, seconds || 8000);
+
+
+        newNotification.node.addEventListener('click', function () {
+            notification.remove(newNotification.id);
+        });
+        var wrNotification = document.getElementById("wr-notification");
+        if (!wrNotification){
+            var newNode = document.createElement("div");
+            newNode.setAttribute('class','wr-notification');
+            document.getElementsByTagName('body')[0].appendChild(newNode);
+            wrNotification = newNode;
+        }
+        wrNotification.appendChild(newNotification.node);
+        newNotification.id = this.counter;
+        this.notifications[this.counter] = newNotification;
+        this.counter++;
+
+    },
+    remove: function (id) {
+        if (!notification.notifications[id]) return; //для случая когда было нажато и закончился таймаут
+        var node = notification.notifications[id].node;
+        clearTimeout(notification.notifications[id].timeOut);
+        this.animation(node,function(){
+            node.parentNode.removeChild(node);
+        });
+        delete notification.notifications[id];
+    },
+    animation: function(node,callback){
+        node.style.opacity = 0.8;
+        var interval = setInterval(function(){
+            var opacity = node.style.opacity - 0.01;
+            node.style.opacity = opacity;
+            if (opacity < 0) {
+                clearInterval(interval);
+                typeof callback == "function" ? callback() : false
+            }
+        },20);
+    }
+};
+
+
+
+
 /**
  * User: Vitalik Kotliar
  * Email: 7vetaly7@ukr.net
@@ -257,17 +379,20 @@ function getGraphJson() {
 }
 
 function saveGraphOnSever() {
+    var graph = {};
     $.ajax({
         url: 'graph/',
         method: 'PUT',
         dataType: 'json',
         contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(combineGraph(global.graph))
+        data: JSON.stringify(combineGraph(global.graph)),
+        async:false
     }).done(function (data) {
-        console.log(data);
+        graph = data;
     }).error(function () {
         console.log("error");
     });
+    return graph;
 }
 
 
@@ -305,6 +430,35 @@ function getNumberNodeByName(json, id) {
             result = i;
     };
     return result;
+};
+
+
+function removeNodes(graph, namesNodes) {
+
+    console.log(namesNodes);
+    var namesNodesArr = namesNodes.split(',');
+
+    namesNodesArr.map(function(nameNode){
+        console.log(nameNode);
+        var numberNode = getNumberNodeByName(graph.nodes, nameNode);
+        if (numberNode != -1) {
+            graph.nodes.splice(numberNode, 1); //delete node from array
+            for (var i = 0; i < graph.links.length; i++) { //delete links that had node
+                if (graph.links[i]['source']['index'] == numberNode
+                    || graph.links[i]['target']['index'] == numberNode) {
+                    graph.links.splice(i, 1);
+                    i--;
+                }
+                else i++;
+            }
+        }
+        else{
+            notification.create("Ошибка","error");
+        }
+        renderGraph(graph);
+    });
+
+
 };
 
 /**

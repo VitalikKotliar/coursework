@@ -3,11 +3,45 @@
  * Email: 7vetaly7@ukr.net
  * Date: 22.05.2015
  */
+var inputData = {
+    weight: [3, 4, 5, 7, 11, 12, 15, 17, 19, 24]
+};
 
 var global = {
     templates: {},
     setting: {
         radiusNode: 15
+    },
+    backup: {
+        backupData: [],
+        currentIndexObj: 0,
+        //TODO сделать более продуманный алгоритм
+        addBackup: function () {
+            //затираем все при добавления бекапа, нужно при добавления новых данных
+            // в середину массива
+            this.backupData.splice(this.currentIndexObj + 1, this.backupData.length);
+            this.currentIndexObj = this.backupData.push(clone(global.graph));
+        },
+        undo: function () {
+            var index = this.currentIndexObj;
+            var backup = this.backupData[index - 1];
+            if (!this.backupData[index + 1]) { //для возможности перехода вперед
+                this.addBackup();
+            }
+            if (backup) {
+                global.graph = backup;
+                renderGraph(saveGraphOnSever());
+                this.currentIndexObj = index - 1;
+            }
+        },
+        redo: function () {
+            var backup = this.backupData[this.currentIndexObj + 1];
+            if (backup) {
+                global.graph = backup;
+                renderGraph(saveGraphOnSever());
+                this.currentIndexObj++;
+            }
+        }
     }
 };
 
@@ -125,9 +159,11 @@ function renderGraph(jsonGraph) {
 
 function initMenu() {
     var $selectFiles = $('.js-file-graph');
-    var field = global.templates["js-template-select"]({data: getListFile()});
-    console.log(field);
-    $selectFiles.append(field);
+    var $selectWeight = $('.js-link-weight');
+
+    $selectFiles.append(global.templates["js-template-select"]({data: getListFile()}));
+    $selectWeight.append(global.templates["js-template-select"]({data: inputData.weight}));
+
 }
 addEventListener("DOMContentLoaded", function () {
 

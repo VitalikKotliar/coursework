@@ -1,3 +1,4 @@
+@import url(notification.css);
 body {
   font-family: 'Helvetica',sans-serif;
   height: 100vh;
@@ -22,5 +23,8 @@ body {
 
 .item-menu {
   padding: 10px; }
+
+.add-link input {
+  margin: 10px 0; }
 
 /*# sourceMappingURL=main.css.map */

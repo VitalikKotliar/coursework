@@ -22,6 +22,10 @@
 
 <div class="wr-menu">
     <div class="item-menu">
+        <button class="js-undo">Назад</button>
+        <button class="js-redo">Впред</button>
+    </div>
+    <div class="item-menu">
         <form method="post" action="add/node" class="js-simple-form">
             Добавление вершины
             <br>
@@ -38,6 +42,36 @@
             <button class="js-remove-node">Удалить</button>
         </form>
     </div>
+
+    <div class="item-menu">
+        <form method="post" class="add-link js-simple-form" action="add/link">
+            Добавление ребра
+            <br>
+            Источник:
+            <input type="text" name="source">
+            <br>
+            Приемник:
+            <input type="text" name="target">
+            <br>
+            <select name="weight" class="js-link-weight"></select>
+            <button type="submit">Добавить</button>
+        </form>
+    </div>
+
+    <div class="item-menu">
+        <form method="post" class="remove-link js-simple-form" action="remove/link">
+            Удаление ребра
+            <br>
+            Источник:
+            <input type="text" name="source">
+            <br>
+            Приемник:
+            <input type="text" name="target">
+            <br>
+            <button type="submit">Удалить</button>
+        </form>
+    </div>
+
     <div class="item-menu">
         <button class="js-save">Сохранить расположение точек</button>
     </div>

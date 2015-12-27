@@ -7,13 +7,13 @@ addEventListener("DOMContentLoaded", function () {
 
     var $forms = $('.js-simple-form');
 
-
     $forms.on("submit", function (e) {
+        global.backup.addBackup();
+
         e.preventDefault();
         e.stopPropagation();
 
         var $this = $(this);
-
         $.ajax({
             url: this.action,
             method: this.method,
@@ -23,6 +23,7 @@ addEventListener("DOMContentLoaded", function () {
             renderGraph(data);
         }).error(function () {
             console.log("error");
+            notification.create("Ошибка","error");
         });
     });
 
@@ -31,29 +32,20 @@ addEventListener("DOMContentLoaded", function () {
     });
 
     $('.js-remove-node').on('click', function (e) {
+        global.backup.addBackup();
+
         e.stopPropagation();
         e.preventDefault();
 
+        var namesNodes = $(this).closest('form').find('input').val();
 
-        var graph = global.graph,
-            nameNode = $(this).closest('form').find('input').val(),
-            numberNode = getNumberNodeByName(graph.nodes, nameNode);
+        removeNodes(global.graph,namesNodes);
 
-        if (numberNode != -1) {
-            graph.nodes.splice(numberNode, 1); //delete node from array
-            for (var i = 0; i < graph.links.length; i++) { //delete links that had node
-                if (graph.links[i]['source']['index'] == numberNode
-                    || graph.links[i]['target']['index'] == numberNode) {
-                    graph.links.splice(i, 1);
-                    i--;
-                }
-                else i++;
-            }
-        }
-        renderGraph(graph);
         saveGraphOnSever();
     });
-    $('.js-file-graph').on('change',function(e){
+    $('.js-file-graph').on('change', function (e) {
+        global.backup.backupData = [];
+
         e.preventDefault();
         e.stopPropagation();
 
@@ -61,13 +53,25 @@ addEventListener("DOMContentLoaded", function () {
         $.ajax({
             url: '/file',
             method: 'post',
-            data: {'file-graph' : this.value},
+            data: {'file-graph': this.value},
             cache: false
         }).done(function (data) {
-            console.log("in done");
             renderGraph();
         }).error(function () {
             console.log("error");
         });
+    });
+
+    /**
+     * UNDO , REDO
+     */
+
+    $('.js-undo').on('click', function () {
+        global.backup.undo();
+
+    });
+
+    $('.js-redo').on('click', function () {
+        global.backup.redo();
     });
 });

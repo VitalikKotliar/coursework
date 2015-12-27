@@ -31,17 +31,20 @@ function getGraphJson() {
 }
 
 function saveGraphOnSever() {
+    var graph = {};
     $.ajax({
         url: 'graph/',
         method: 'PUT',
         dataType: 'json',
         contentType: 'application/json; charset=utf-8',
-        data: JSON.stringify(combineGraph(global.graph))
+        data: JSON.stringify(combineGraph(global.graph)),
+        async:false
     }).done(function (data) {
-        console.log(data);
+        graph = data;
     }).error(function () {
         console.log("error");
     });
+    return graph;
 }
 
 
@@ -79,6 +82,35 @@ function getNumberNodeByName(json, id) {
             result = i;
     };
     return result;
+};
+
+
+function removeNodes(graph, namesNodes) {
+
+    console.log(namesNodes);
+    var namesNodesArr = namesNodes.split(',');
+
+    namesNodesArr.map(function(nameNode){
+        console.log(nameNode);
+        var numberNode = getNumberNodeByName(graph.nodes, nameNode);
+        if (numberNode != -1) {
+            graph.nodes.splice(numberNode, 1); //delete node from array
+            for (var i = 0; i < graph.links.length; i++) { //delete links that had node
+                if (graph.links[i]['source']['index'] == numberNode
+                    || graph.links[i]['target']['index'] == numberNode) {
+                    graph.links.splice(i, 1);
+                    i--;
+                }
+                else i++;
+            }
+        }
+        else{
+            notification.create("Ошибка","error");
+        }
+        renderGraph(graph);
+    });
+
+
 };
 
 /**

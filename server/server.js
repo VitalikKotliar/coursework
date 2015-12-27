@@ -2,7 +2,7 @@ var myFunctions = require('./service'),
     express = require('express'),
     app = express(),
     path = require('path'),
-    port = 8080,
+    port = 5656,
     fs = require('fs'),
     rootProject = "/home/vitalik/Projects/course_work_my/", //TODO найти лучшее решение
     pathFilesData = path.join(rootProject + '/server/data'),
@@ -10,7 +10,7 @@ var myFunctions = require('./service'),
     jsonfile = require('jsonfile'), // for usability read and write file
     bodyParser = require('body-parser'),
     dirPath = rootProject + 'server/data';
-    global.fileNameData = [];
+global.fileNameData = [];
 
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -55,7 +55,11 @@ app.put('/graph', function (req, res) {
     var graph = req.body;
     jsonfile.writeFile(pathJsonFile, graph, function (err) {
         if (err) res.statusCode = 404;
-        res.statusCode = 200;
+        jsonfile.readFile(pathJsonFile, function (err, obj) {
+            if (err) res.statusCode = 400;
+            res.send(obj);
+            res.statusCode = 200;
+        });
     });
 
 });
@@ -69,7 +73,6 @@ app.put('/graph', function (req, res) {
  */
 
 app.post('/add/node', function (req, res) {
-
     console.log("post requst add node");
 
     jsonfile.readFile(pathJsonFile, function (err, obj) {
@@ -102,45 +105,114 @@ app.post('/add/node', function (req, res) {
  * REMOVE NODE
  */
 
-app.post('/remove/node', function (req, res) {
 
-    console.log("post request remove node");
+//app.post('/remove/node', function (req, res) {
+//
+//    console.log("post request remove node");
+//
+//    var idNode = req.body.idNode;
+//
+//    jsonfile.readFile(pathJsonFile, function (err, obj) {
+//        if (err) res.statusCode = 404;
+//        var json = obj;
+//
+//        var numberNode = global.getNumberNodeById(json.nodes, idNode);
+//
+//        if (numberNode != -1) {
+//            json.nodes.splice(numberNode, 1); //delete node from array
+//            // remove all link with this node
+//            for (var i = 0; i < json.links.length; i++) {
+//                if (json.links[i]['source'] == numberNode || json.links[i]['target'] == numberNode) {
+//                    json.links.splice(i, 1);
+//                    i--;
+//                }
+//                else i++;
+//            }
+//        }
+//        jsonfile.writeFile(pathJsonFile, json, function (err) {
+//            if (err) res.statusCode = 404;
+//            //возвращаем на клиет весь джсон
+//            jsonfile.readFile(pathJsonFile, function (err, obj) {
+//                res.statusCode = 200;
+//                res.send(obj);
+//            });
+//        });
+//    });
+//});
 
-    var idNode = req.body.idNode;
+
+/**
+ * ADD LINK
+ */
+
+app.post('/add/link', function (req, res) {
+
+    console.log("post requst add link");
 
     jsonfile.readFile(pathJsonFile, function (err, obj) {
         if (err) res.statusCode = 404;
         var json = obj;
-
-        var numberNode = global.getNumberNodeById(json.nodes, idNode);
-
-        if (numberNode != -1) {
-            json.nodes.splice(numberNode, 1); //delete node from array
-            //json.nodes[numberNode] = {"fixed":true};
-            // remove all link with this node
-            for (var i = 0; i < json.links.length; i++) {
-                console.log("in for");
-                if (json.links[i]['source'] == numberNode || json.links[i]['target'] == numberNode) {
-                    json.links.splice(i, 1);
-                    i--;
+        var source = global.getNumberNodeByName(json.nodes, req.body.source);
+        var target = global.getNumberNodeByName(json.nodes, req.body.target);
+        console.log(source);
+        console.log(target);
+        if (source && target) {
+            json.links.push(
+                {
+                    "source": source,
+                    "target": target,
+                    "value": 5,
+                    "weight": req.body.weight
                 }
-                else i++;
-            }
-        }
-        jsonfile.writeFile(pathJsonFile, json, function (err) {
-            if (err) res.statusCode = 404;
-            //возвращаем на клиет весь джсон
-            jsonfile.readFile(pathJsonFile, function (err, obj) {
-                res.statusCode = 200;
-                res.send(obj);
+            );
+            jsonfile.writeFile(pathJsonFile, json, function (err) {
+                if (err) res.statusCode = 404;
+                //возвращаем на клиет весь джсон
+                jsonfile.readFile(pathJsonFile, function (err, obj) {
+                    res.statusCode = 200;
+                    res.send(obj);
+                });
             });
-        });
+        }
+        else{
+            res.statusCode = 400;
+            res.send("error");
+        }
     });
 });
 
+
 /**
- * CRUD end
+ * REMOVE LINK
  */
+
+app.post('/remove/link', function (req, res) {
+
+    console.log("post requst remove link");
+
+    jsonfile.readFile(pathJsonFile, function (err, obj) {
+        if (err) res.statusCode = 404;
+        var target = global.getNumberNodeByName(obj.nodes, req.body.target);
+        var source = global.getNumberNodeByName(obj.nodes, req.body.source);
+        var numberLink = global.getNumberLinkByTrgAndSrc(obj.links, target, source);
+        console.log(numberLink);
+        if (numberLink != -1) {
+            obj.links.splice(numberLink, 1);
+            jsonfile.writeFile(pathJsonFile, obj, function (err) {
+                if (err) res.statusCode = 404;
+                //возвращаем на клиет весь джсон
+                jsonfile.readFile(pathJsonFile, function (err, obj) {
+                    res.statusCode = 200;
+                    res.send(obj);
+                });
+            });
+        }
+        else{
+            res.statusCode = 400;
+            res.send("error");
+        }
+    });
+});
 
 /**
  * MENU FILES
@@ -161,7 +233,7 @@ app.post('/file', function (req, res) {
         console.log(pathJsonFile);
         res.send('successful');
     }
-    else{
+    else {
         res.statusCode = 404;
     }
 });
@@ -171,4 +243,4 @@ app.listen(port);
 
 
 console.log("server running " + port);
-console.log("http://localhost:8080");
+console.log("http://localhost:" + port);

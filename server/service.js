@@ -8,11 +8,11 @@ var fs = require('fs');
 var path = require('path');
 
 
-global.getNumberNodeById = function (json, id) {
+global.getNumberNodeByName = function (json, name) {
     var length = json.length;
-    var result = -1;
+    var result = undefined;
     for (var i = 0; i < length; i++) {
-        if (json[i].name == id)
+        if (json[i].name == name)
             result = i;
     };
     return result;
@@ -29,4 +29,16 @@ global.getFileNameInDirectory = function (dirPath) {
             }
         global.fileNameData = files;
     });
+};
+
+global.getNumberLinkByTrgAndSrc = function (json,target,source) {
+    var length = json.length;
+    var result = -1;
+    for (var i = 0; i < length; i++) {
+        if (json[i].source == source && json[i].target == target ||
+            json[i].source == target && json[i].target == source
+        )
+            result = i;
+    };
+    return result;
 };
