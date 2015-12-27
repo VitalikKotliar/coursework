@@ -4,7 +4,9 @@
  * Date: 22.05.2015
  */
 var inputData = {
-    weight: [3, 4, 5, 7, 11, 12, 15, 17, 19, 24]
+    weights: [3, 4, 5, 7, 11, 12, 15, 17, 19, 24],
+    minColLink:4,
+    colNodeInRegionNetwork:12
 };
 
 var global = {
@@ -47,18 +49,18 @@ var global = {
 
 
 function initWindow() {
-    var height = window.innerHeight;
-    var width = window.innerWidth;
-
+    global.height = window.innerHeight;
+    global.width = window.innerWidth;
+    global.svgWidth = window.innerWidth/100 * 80;
 
     global.force = d3.layout.force()
         //.charge(-120)
         //.linkDistance(30)
-        .size([width, height]);
+        .size([global.svgWidth, global.height]);
 
     global.svg = d3.select("svg")
-        .attr("width", width)
-        .attr("height", height);
+        .attr("width", global.svgWidth)
+        .attr("height", global.height);
 };
 
 function renderGraph(jsonGraph) {
@@ -78,14 +80,18 @@ function renderGraph(jsonGraph) {
     // но ноды дожны быть выше в дом дереве что бы они показывались выше ликов
     var linksWrapper = global.svg.selectAll(".link")
         .data(global.graph.links)
-        .enter().append("g");
+        .enter().append("g")
+        .attr('data-id', function (d) {
+            console.log(d.target);
+            return d.source.id + "-" + d.target.id;
+        })
 
     var linkLine = linksWrapper
         .append('line')
-        .attr("class", "link-line")
-        .style("stroke-width", function (d) {
-            return Math.sqrt(d.weight);
-        });
+        .attr("class", "link-line");
+        //.style("stroke-width", function (d) {
+        //    return d.weight / 5;
+        //});
 
     //append element text in each linkWrapper
     var linkText = linksWrapper
@@ -99,7 +105,9 @@ function renderGraph(jsonGraph) {
     //добавляем g куда будем ложить саму точку и текст
     var nodesWrapper = global.svg.selectAll(".node")
         .data(global.graph.nodes)
-        .enter().append("g")
+        .enter().append("g").attr('data-id', function (d) {
+            return d.id;
+        })
         .style("fill", function (d) {
             return color(d.group);
         })
@@ -162,26 +170,25 @@ function initMenu() {
     var $selectWeight = $('.js-link-weight');
 
     $selectFiles.append(global.templates["js-template-select"]({data: getListFile()}));
-    $selectWeight.append(global.templates["js-template-select"]({data: inputData.weight}));
+    $selectWeight.append(global.templates["js-template-select"]({data: inputData.weights}));
 
 }
-addEventListener("DOMContentLoaded", function () {
+/**
+ *
+ * TEMPLATES COMPILING
+ */
 
-    /**
-     *
-     * TEMPLATES COMPILING
-     */
-
+function initTemplates() {
     var $templates = $('.js-templates');
 
     Array.prototype.map.call($templates, function (elem) {
         var source = $(elem).html();
         global.templates[elem.id] = Handlebars.compile(source);
     });
+}
 
-    /**
-     * INIT D3
-     */
+addEventListener("DOMContentLoaded", function () {
+    initTemplates();
     initMenu();
     initWindow();
     renderGraph();

@@ -10,7 +10,8 @@ body {
   fill: #fff; }
 
 .link-line {
-  stroke: #999; }
+  stroke: #999;
+  stroke-width: 1px; }
 
 .link-text {
   fill: #000; }

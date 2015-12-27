@@ -74,4 +74,9 @@ addEventListener("DOMContentLoaded", function () {
     $('.js-redo').on('click', function () {
         global.backup.redo();
     });
+
+    $('.js-random-graph').on('click',function(){
+        renderGraph(createRandomGraph());
+        saveGraphOnSever();
+    });
 });

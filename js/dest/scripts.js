@@ -74,6 +74,11 @@ addEventListener("DOMContentLoaded", function () {
     $('.js-redo').on('click', function () {
         global.backup.redo();
     });
+
+    $('.js-random-graph').on('click',function(){
+        renderGraph(createRandomGraph());
+        saveGraphOnSever();
+    });
 });
 
 /**
@@ -82,7 +87,9 @@ addEventListener("DOMContentLoaded", function () {
  * Date: 22.05.2015
  */
 var inputData = {
-    weight: [3, 4, 5, 7, 11, 12, 15, 17, 19, 24]
+    weights: [3, 4, 5, 7, 11, 12, 15, 17, 19, 24],
+    minColLink:4,
+    colNodeInRegionNetwork:12
 };
 
 var global = {
@@ -125,18 +132,18 @@ var global = {
 
 
 function initWindow() {
-    var height = window.innerHeight;
-    var width = window.innerWidth;
-
+    global.height = window.innerHeight;
+    global.width = window.innerWidth;
+    global.svgWidth = window.innerWidth/100 * 80;
 
     global.force = d3.layout.force()
         //.charge(-120)
         //.linkDistance(30)
-        .size([width, height]);
+        .size([global.svgWidth, global.height]);
 
     global.svg = d3.select("svg")
-        .attr("width", width)
-        .attr("height", height);
+        .attr("width", global.svgWidth)
+        .attr("height", global.height);
 };
 
 function renderGraph(jsonGraph) {
@@ -156,14 +163,18 @@ function renderGraph(jsonGraph) {
     // но ноды дожны быть выше в дом дереве что бы они показывались выше ликов
     var linksWrapper = global.svg.selectAll(".link")
         .data(global.graph.links)
-        .enter().append("g");
+        .enter().append("g")
+        .attr('data-id', function (d) {
+            console.log(d.target);
+            return d.source.id + "-" + d.target.id;
+        })
 
     var linkLine = linksWrapper
         .append('line')
-        .attr("class", "link-line")
-        .style("stroke-width", function (d) {
-            return Math.sqrt(d.weight);
-        });
+        .attr("class", "link-line");
+        //.style("stroke-width", function (d) {
+        //    return d.weight / 5;
+        //});
 
     //append element text in each linkWrapper
     var linkText = linksWrapper
@@ -177,7 +188,9 @@ function renderGraph(jsonGraph) {
     //добавляем g куда будем ложить саму точку и текст
     var nodesWrapper = global.svg.selectAll(".node")
         .data(global.graph.nodes)
-        .enter().append("g")
+        .enter().append("g").attr('data-id', function (d) {
+            return d.id;
+        })
         .style("fill", function (d) {
             return color(d.group);
         })
@@ -240,26 +253,25 @@ function initMenu() {
     var $selectWeight = $('.js-link-weight');
 
     $selectFiles.append(global.templates["js-template-select"]({data: getListFile()}));
-    $selectWeight.append(global.templates["js-template-select"]({data: inputData.weight}));
+    $selectWeight.append(global.templates["js-template-select"]({data: inputData.weights}));
 
 }
-addEventListener("DOMContentLoaded", function () {
+/**
+ *
+ * TEMPLATES COMPILING
+ */
 
-    /**
-     *
-     * TEMPLATES COMPILING
-     */
-
+function initTemplates() {
     var $templates = $('.js-templates');
 
     Array.prototype.map.call($templates, function (elem) {
         var source = $(elem).html();
         global.templates[elem.id] = Handlebars.compile(source);
     });
+}
 
-    /**
-     * INIT D3
-     */
+addEventListener("DOMContentLoaded", function () {
+    initTemplates();
     initMenu();
     initWindow();
     renderGraph();
@@ -349,6 +361,196 @@ notification = {
 /**
  * User: Vitalik Kotliar
  * Email: 7vetaly7@ukr.net
+ * Date: 27.12.15
+ */
+
+function createRandomGraph() {
+    var graph = {},
+        colNodeInRegionNetwork = 12,
+        nameNode = 0,
+        idNode = 0,
+        padding = getWidthInProcent(15), //отступ от краев 15 проценво
+        topBorder = padding,
+        bottomBorder = global.height - padding,
+        leftBorder = padding,
+        rightBorder = global.svgWidth - padding,
+    //minDistance = getWidthInProcent(5);
+        minDistance = 75;
+
+    function createNodes() {
+        function addNode(x, y) {
+            var node = {};
+            node.x = x;
+            node.y = y;
+            node.name = nameNode;
+            node.id = idNode;
+            node.group = 1;
+            node.fixed = 1;
+            graph.nodes.push(node);
+            nameNode++;
+            idNode++;
+        };
+        function createTwoCenterPoint() {
+            var centerX = global.svgWidth / 2,
+                centerY = global.height / 2,
+                procentWidth = global.svgWidth / 100 * 5;
+            addNode(centerX - procentWidth, centerY);
+            addNode(centerX + procentWidth, centerY);
+        };
+        function createElsePoint(lLimit, rLimit) {
+            function addLeftSection(leftBor, rightBor) {
+                function checkDistance(x1, y1) {
+                    //проходим по массиву нодов и проверяем растояния
+                    var flag = true;
+                    graph.nodes.map(function (node) {
+                        if (distanceBetweenPoint(x1, y1, node.x, node.y) < minDistance) {
+                            flag = false;
+                        }
+                    });
+                    return flag;
+                }
+
+                var counterAddNode = 0;
+                while (counterAddNode < inputData.colNodeInRegionNetwork) {
+                    var tmpX = getRandomInt(leftBor, rightBor);
+                    var tmpY = getRandomInt(bottomBorder, topBorder);
+                    var iteration = 0;
+                    //подбираем точки пока растояние не будет больше минимального
+                    while (!checkDistance(tmpX, tmpY)) {
+                        if (iteration > 100) {
+                            console.log("it is not impossible get coordinates point with assigned min distance");
+                            break;
+                        }
+                        tmpX = getRandomInt(leftBor, rightBor);
+                        tmpY = getRandomInt(bottomBorder, topBorder);
+                        iteration++;
+                    }
+                    addNode(tmpX, tmpY);
+                    counterAddNode++;
+                }
+            };
+
+            addLeftSection(leftBorder, lLimit);
+            addLeftSection(rLimit, rightBorder);
+        };
+        graph.nodes = [];
+
+        createTwoCenterPoint();
+        /**
+         * lLimit - правая граница для точек слева
+         */
+        createElsePoint(graph.nodes[0].x - minDistance, graph.nodes[1].x + minDistance);
+        //console.log(getRandomInt(1, 2));
+    }
+
+
+    function createLink() {
+        function addLink(source, target) {
+            var link = {};
+            var ranWeight
+                = inputData.weights[getRandomInt(0, inputData.weights.length)];
+            link.source = source;
+            link.target = target;
+            link.weight = ranWeight;
+            graph.links.push(link);
+        }
+
+        function addCentralLink() {
+            addLink(0, 1);
+        }
+
+        function addElseLinks() {
+
+            function isExistLink(source, target) {
+                var flag = false;
+                graph.links.map(function (elem) {
+                    if (elem.source == source && elem.target == target ||
+                        elem.target == source && elem.source == target) {
+                        flag = true;
+                    }
+                })
+                return flag
+            };
+
+            function colLinksByNumberNode(number) {
+                var counter = 0;
+                graph.links.map(function (elem) {
+                    if (elem.source == number || elem.target == number) {
+                        counter++;
+                    }
+                })
+                return counter
+            };
+
+            function addSection(startIndexNode, endIndexNode) {
+                for (var i = startIndexNode; i < endIndexNode; i++) {
+                    var iteration = 0;
+                    var colLinkSource = colLinksByNumberNode(i);
+                    while (colLinkSource < inputData.minColLink) {
+                        var source = i;
+                        var target = getRandomInt(startIndexNode, endIndexNode);
+                        if (!isExistLink(source, target)
+                            && target != source
+                            && colLinksByNumberNode(target) < inputData.minColLink) {
+                            addLink(source, target);
+                            colLinkSource = colLinksByNumberNode(i);
+                        }
+                        iteration++;
+                        if (iteration > 100) {
+                            console.log("it is not impossible ");
+                            break;
+                        }
+                    }
+                }
+            }
+
+
+            function addLinkLeftCenter() {
+                var colLink = 1;
+                while (colLink < inputData.minColLink) {
+                    var source = 0;
+                    var target = getRandomInt(1, inputData.colNodeInRegionNetwork);
+                    if (!isExistLink(source, target)) {
+                        addLink(source, target);
+                        colLink++;
+                    }
+                }
+            };
+            function addLinkRightCenter() {
+                var colLink = 1;
+                while (colLink < inputData.minColLink) {
+                    var source = 1;
+                    var target = getRandomInt(colNodeInRegionNetwork + 2, graph.nodes.length);
+                    addLink(source, target);
+                    colLink++;
+                }
+            };
+
+
+
+            // + 2 потому что две центральных
+            addSection(2, inputData.colNodeInRegionNetwork + 2);
+            addLinkLeftCenter();
+            addSection(inputData.colNodeInRegionNetwork + 2, graph.nodes.length);
+            addLinkRightCenter();
+
+
+        }
+
+        graph.links = [];
+        addCentralLink();
+        addElseLinks();
+    }
+
+
+    createNodes();
+    createLink();
+    return graph;
+}
+
+/**
+ * User: Vitalik Kotliar
+ * Email: 7vetaly7@ukr.net
  * Date: 23.12.15
  */
 
@@ -356,6 +558,19 @@ function getCenterLine(x1, x2) {
     return Math.round((x1 + x2) / 2);
 }
 
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function distanceBetweenPoint(x1,y1,x2,y2){
+    return Math.sqrt(Math.pow((x1 - x2),2) + Math.pow((y1 - y2),2));
+};
+
+
+function getWidthInProcent(procent){
+    return global.svgWidth / 100 * procent;
+};
 
 /**
  * FUNCTION WORK WITH API
@@ -460,6 +675,8 @@ function removeNodes(graph, namesNodes) {
 
 
 };
+
+
 
 /**
  * MENU FILES

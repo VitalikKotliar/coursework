@@ -162,7 +162,7 @@ app.post('/add/link', function (req, res) {
                     "source": source,
                     "target": target,
                     "value": 5,
-                    "weight": req.body.weight
+                    "weights": req.body.weights
                 }
             );
             jsonfile.writeFile(pathJsonFile, json, function (err) {

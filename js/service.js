@@ -9,6 +9,19 @@ function getCenterLine(x1, x2) {
 }
 
 
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
+function distanceBetweenPoint(x1,y1,x2,y2){
+    return Math.sqrt(Math.pow((x1 - x2),2) + Math.pow((y1 - y2),2));
+};
+
+
+function getWidthInProcent(procent){
+    return global.svgWidth / 100 * procent;
+};
+
 /**
  * FUNCTION WORK WITH API
  *
@@ -112,6 +125,8 @@ function removeNodes(graph, namesNodes) {
 
 
 };
+
+
 
 /**
  * MENU FILES
