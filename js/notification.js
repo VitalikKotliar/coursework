@@ -30,8 +30,7 @@ notification = {
 
         var newNotification = {};
         newNotification.node = document.createElement("div");
-        console.log(newNotification.node);
-        newNotification.node.innerText = text || "notification";
+        newNotification.node.innerHTML = text || "notification";
         newNotification.node.className = "notification " + (type || "info");
 
         newNotification.timeOut = setTimeout(function () {
@@ -45,6 +44,7 @@ notification = {
         var wrNotification = document.getElementById("wr-notification");
         if (!wrNotification){
             var newNode = document.createElement("div");
+            newNode.setAttribute('id','wr-notification');
             newNode.setAttribute('class','wr-notification');
             document.getElementsByTagName('body')[0].appendChild(newNode);
             wrNotification = newNode;
@@ -65,7 +65,7 @@ notification = {
         delete notification.notifications[id];
     },
     animation: function(node,callback){
-        node.style.opacity = 0.8;
+        node.style.opacity = 1;
         var interval = setInterval(function(){
             var opacity = node.style.opacity - 0.01;
             node.style.opacity = opacity;

@@ -3,6 +3,14 @@
  * Email: 7vetaly7@ukr.net
  * Date: 23.12.15
  */
+
+function initClickNode(){
+    var nodeCircle = d3.selectAll('.node');
+    nodeCircle.on('click', function () {
+        saveGraphOnSever();
+    })
+};
+
 addEventListener("DOMContentLoaded", function () {
 
     var $forms = $('.js-simple-form');
@@ -62,6 +70,9 @@ addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    //$('.node-circle').on('click',function(){
+    //    console.log("click");
+    //});
     /**
      * UNDO , REDO
      */
@@ -75,8 +86,46 @@ addEventListener("DOMContentLoaded", function () {
         global.backup.redo();
     });
 
+    //$('.js-all-nodes-left').on('click',function(){
+    //    console.log(global.graph.nodes);
+    //    global.graph.nodes.map(function (node,index) {
+    //        global.graph.nodes[index] = node.x - 30;
+    //    });
+    //    console.log(global.graph.nodes);
+    //    saveGraphOnSever();
+    //    renderGraph();
+    //});
+
+
     $('.js-random-graph').on('click',function(){
+        $('.modal-random-graph').modal('toggle');
+    });
+
+    $('.js-random-graph-confirmation').on('click',function(){
         renderGraph(createRandomGraph());
         saveGraphOnSever();
     });
+
+    $('.cancel').on('click',function(){
+        $('.modal').modal('hide');
+    });
+
+    $('.js-shortest-way').on('click',function(){
+        var nodeNumber = getNumberNodeByName( global.graph.nodes,'1');
+        console.log(nodeNumber);
+        console.log(searchShortestPathes(nodeNumber, global.graph.nodes.length, global.graph.graphMatrix));
+    });
+
+
+    /**
+     * MENU UI
+     */
+
+    $('.js-section-title').on('click',function(){
+        var $this = $(this);
+        $this.toggleClass('on')
+            .closest('.js-section').find('.js-section-content')
+            .animate({height:'toggle'},350);
+    });
+
 });

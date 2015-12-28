@@ -1,37 +1,67 @@
+@import "bootstrap.css";
+@import "font-awesome.min.css";
 @import "notification.css";
 
 body {
-    font-family:'Helvetica',sans-serif;
-    height: 100vh;
-    padding: 0;
-    margin: 0;
-    font-size: 18px;
+  font-family: 'Helvetica', sans-serif;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  font-size: 18px;
 }
 
 .node-text {
-    fill: #fff;
+  fill: #fff;
 }
 
 .link-line {
-    stroke: #999;
-    stroke-width:1px;
+  stroke: #999;
+  stroke-width: 1px;
 }
 
-.link-text{
-    fill: #000;
+.link-text {
+  fill: #000;
 }
 
-.wr-menu{
-    position: fixed;
-    top: 0;
-    right: 0;
-    padding: 20px;
+.wr-menu {
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 20px;
+  width: 20%;
+  box-sizing: border-box;
+  button {
+    margin: 5px;
+  }
 }
 
-.item-menu{
-    padding: 10px;
+//.item-menu{
+//  text-align: center;
+//}
+
+.section-content {
+  display: none;
 }
 
-.add-link input{
-    margin: 10px 0;
+.section-title {
+  .fa {
+    float: right;
+  }
+  .fa:before {
+    content: "\f0fe";
+  }
+  &.on .fa:before {
+    content: "\f146";
+  }
+}
+
+.addition {
+  text-align: center;
+  button {
+    width: 44%;
+  }
+}
+
+.item-menu button{
+  margin-left: 0;
 }

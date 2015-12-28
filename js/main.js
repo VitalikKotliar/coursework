@@ -82,7 +82,6 @@ function renderGraph(jsonGraph) {
         .data(global.graph.links)
         .enter().append("g")
         .attr('data-id', function (d) {
-            console.log(d.target);
             return d.source.id + "-" + d.target.id;
         })
 
@@ -107,7 +106,7 @@ function renderGraph(jsonGraph) {
         .data(global.graph.nodes)
         .enter().append("g").attr('data-id', function (d) {
             return d.id;
-        })
+        }).attr('class','node')
         .style("fill", function (d) {
             return color(d.group);
         })
@@ -166,10 +165,16 @@ function renderGraph(jsonGraph) {
 };
 
 function initMenu() {
+
+
+
+
+
     var $selectFiles = $('.js-file-graph');
     var $selectWeight = $('.js-link-weight');
 
     $selectFiles.append(global.templates["js-template-select"]({data: getListFile()}));
+    $selectFiles.val(getSelectedFile());
     $selectWeight.append(global.templates["js-template-select"]({data: inputData.weights}));
 
 }
@@ -192,4 +197,5 @@ addEventListener("DOMContentLoaded", function () {
     initMenu();
     initWindow();
     renderGraph();
+    initClickNode(); // добавляем событие клика после рендера
 });

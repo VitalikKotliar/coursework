@@ -3,6 +3,14 @@
  * Email: 7vetaly7@ukr.net
  * Date: 23.12.15
  */
+
+function initClickNode(){
+    var nodeCircle = d3.selectAll('.node');
+    nodeCircle.on('click', function () {
+        saveGraphOnSever();
+    })
+};
+
 addEventListener("DOMContentLoaded", function () {
 
     var $forms = $('.js-simple-form');
@@ -62,6 +70,9 @@ addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    //$('.node-circle').on('click',function(){
+    //    console.log("click");
+    //});
     /**
      * UNDO , REDO
      */
@@ -75,10 +86,48 @@ addEventListener("DOMContentLoaded", function () {
         global.backup.redo();
     });
 
+    //$('.js-all-nodes-left').on('click',function(){
+    //    console.log(global.graph.nodes);
+    //    global.graph.nodes.map(function (node,index) {
+    //        global.graph.nodes[index] = node.x - 30;
+    //    });
+    //    console.log(global.graph.nodes);
+    //    saveGraphOnSever();
+    //    renderGraph();
+    //});
+
+
     $('.js-random-graph').on('click',function(){
+        $('.modal-random-graph').modal('toggle');
+    });
+
+    $('.js-random-graph-confirmation').on('click',function(){
         renderGraph(createRandomGraph());
         saveGraphOnSever();
     });
+
+    $('.cancel').on('click',function(){
+        $('.modal').modal('hide');
+    });
+
+    $('.js-shortest-way').on('click',function(){
+        var nodeNumber = getNumberNodeByName( global.graph.nodes,'1');
+        console.log(nodeNumber);
+        console.log(searchShortestPathes(nodeNumber, global.graph.nodes.length, global.graph.graphMatrix));
+    });
+
+
+    /**
+     * MENU UI
+     */
+
+    $('.js-section-title').on('click',function(){
+        var $this = $(this);
+        $this.toggleClass('on')
+            .closest('.js-section').find('.js-section-content')
+            .animate({height:'toggle'},350);
+    });
+
 });
 
 /**
@@ -165,7 +214,6 @@ function renderGraph(jsonGraph) {
         .data(global.graph.links)
         .enter().append("g")
         .attr('data-id', function (d) {
-            console.log(d.target);
             return d.source.id + "-" + d.target.id;
         })
 
@@ -190,7 +238,7 @@ function renderGraph(jsonGraph) {
         .data(global.graph.nodes)
         .enter().append("g").attr('data-id', function (d) {
             return d.id;
-        })
+        }).attr('class','node')
         .style("fill", function (d) {
             return color(d.group);
         })
@@ -249,10 +297,16 @@ function renderGraph(jsonGraph) {
 };
 
 function initMenu() {
+
+
+
+
+
     var $selectFiles = $('.js-file-graph');
     var $selectWeight = $('.js-link-weight');
 
     $selectFiles.append(global.templates["js-template-select"]({data: getListFile()}));
+    $selectFiles.val(getSelectedFile());
     $selectWeight.append(global.templates["js-template-select"]({data: inputData.weights}));
 
 }
@@ -275,6 +329,7 @@ addEventListener("DOMContentLoaded", function () {
     initMenu();
     initWindow();
     renderGraph();
+    initClickNode(); // добавляем событие клика после рендера
 });
 /**
  * User: Vitalik Kotliar
@@ -308,8 +363,7 @@ notification = {
 
         var newNotification = {};
         newNotification.node = document.createElement("div");
-        console.log(newNotification.node);
-        newNotification.node.innerText = text || "notification";
+        newNotification.node.innerHTML = text || "notification";
         newNotification.node.className = "notification " + (type || "info");
 
         newNotification.timeOut = setTimeout(function () {
@@ -323,6 +377,7 @@ notification = {
         var wrNotification = document.getElementById("wr-notification");
         if (!wrNotification){
             var newNode = document.createElement("div");
+            newNode.setAttribute('id','wr-notification');
             newNode.setAttribute('class','wr-notification');
             document.getElementsByTagName('body')[0].appendChild(newNode);
             wrNotification = newNode;
@@ -343,7 +398,7 @@ notification = {
         delete notification.notifications[id];
     },
     animation: function(node,callback){
-        node.style.opacity = 0.8;
+        node.style.opacity = 1;
         var interval = setInterval(function(){
             var opacity = node.style.opacity - 0.01;
             node.style.opacity = opacity;
@@ -577,33 +632,20 @@ function getWidthInProcent(procent){
  *
  */
 
-function getGraphJson() {
-    var json = {};
-    $.ajax({
-        url: '/graph',
-        method: 'get',
-        async:false
-    }).done(function (data) {
-        console.log(json);
-        json = data;
-    }).error(function () {
-        console.log("error");
-    });
-    console.log(json);
-    return json;
-}
-
 function saveGraphOnSever() {
     var graph = {};
+    generateAdjacencyMatrix();
     $.ajax({
         url: 'graph/',
         method: 'PUT',
         dataType: 'json',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(combineGraph(global.graph)),
-        async:false
+        async:false,
+        cache: false
     }).done(function (data) {
         graph = data;
+        notification.create("Сохранено",'info');
     }).error(function () {
         console.log("error");
     });
@@ -650,11 +692,9 @@ function getNumberNodeByName(json, id) {
 
 function removeNodes(graph, namesNodes) {
 
-    console.log(namesNodes);
     var namesNodesArr = namesNodes.split(',');
 
     namesNodesArr.map(function(nameNode){
-        console.log(nameNode);
         var numberNode = getNumberNodeByName(graph.nodes, nameNode);
         if (numberNode != -1) {
             graph.nodes.splice(numberNode, 1); //delete node from array
@@ -666,6 +706,7 @@ function removeNodes(graph, namesNodes) {
                 }
                 else i++;
             }
+            notification.create("Успешно удалено","success");
         }
         else{
             notification.create("Ошибка","error");
@@ -679,15 +720,31 @@ function removeNodes(graph, namesNodes) {
 
 
 /**
- * MENU FILES
+ * GET DATA FROM SERVER
  */
+
+function getGraphJson() {
+    var json = {};
+    $.ajax({
+        url: '/graph',
+        method: 'get',
+        async:false,
+        cache: false
+    }).done(function (data) {
+        json = data;
+    }).error(function () {
+        console.log("error");
+    });
+    return json;
+}
 
 function getListFile() {
     var listFiles = [];
     $.ajax({
         url: '/files',
         method: 'get',
-        async:false
+        async:false,
+        cache: false
     }).done(function (data) {
         listFiles = data;
     }).error(function () {
@@ -695,3 +752,100 @@ function getListFile() {
     });
     return listFiles;
 }
+
+function getSelectedFile() {
+    var selectedFile;
+    $.ajax({
+        url: '/file/current',
+        method: 'get',
+        async:false,
+        cache: false
+    }).done(function (data) {
+        selectedFile = data;
+    }).error(function () {
+        console.log("error");
+    });
+    return selectedFile;
+}
+
+/**
+ * заполняет матрицу смежностти графа, на основе данных с d3
+ */
+
+function generateAdjacencyMatrix () {
+    global.graph.graphMatrix = [];
+    //инициализируем массив
+    for (var i = 0; i < global.graph.nodes.length; i++) {
+        global.graph.graphMatrix[i] = [];
+        for (var j = 0; j < global.graph.nodes.length; j++) {
+            global.graph.graphMatrix[i][j] = 0;
+        }
+    }
+    //устанавливаем вес кажого из ребер в нужную ячейку
+    for (var k = 0; k < global.graph.nodes.length; k++) {
+        for (var l = 0; l < global.graph.links.length; l++) {
+            //console.log(k);
+            var graphMatrixIndex = global.graph.links[l].source.index;
+            if (global.graph.links[l].source.index == k) {
+                var linkWeight = getWeihgtLink(global.graph.links[l].weight, global.graph.links[l].type);
+                //var linkWeight = $filter('calculateLinkWeight')(global.graph.links[l].weight, global.graph.links[l].type, global.graph.links[l].satelliteChannel);
+                global.graph.graphMatrix[graphMatrixIndex][global.graph.links[l].target.index] = linkWeight;
+                global.graph.graphMatrix[global.graph.links[l].target.index][graphMatrixIndex] = linkWeight;
+            }
+        }
+    }
+    //this.consoleLogMatrix(this.dataSet.graphMatrix);
+};
+
+/**
+ *
+ * Поиск кратчаейшего пути
+ *
+ */
+function searchShortestPathes(start, nodesCount, matrix) {
+    //готовим массив к поиску TODO нужно ли это?
+    //    var array = this.dataSet.nodes;
+    //    var newVertex = array.splice(start,1);
+    //    array.unshift(newVertex[0]);
+
+    var array = global.graph.nodes;
+
+    var searchTable = [];
+    // тут храним текущею и предидущую вершиныЮ для исключения их с проверки
+    var vertexArray = [];
+    // сначала инициализируем таблицу поиска (всем кроме стартовой вершины - infinity)
+    for (var k = 0; k < nodesCount; k++) {
+        searchTable[k] = Infinity
+    }
+    // вершину начала поиска обнуляем
+    searchTable[start] = 0;
+    vertexArray.push(start);
+
+    // n-1 итераций согласно алгоритму
+    for (var m = 0; m < array.length - 1; m++) {
+        for (var i = 0; i < array.length; i++) {
+            vertexArray.push(array[i].index);
+            var prevVertex = vertexArray[0];
+            var tempVertex = vertexArray[vertexArray.length - 1];
+            for (var j = 0; j < array.length; j++) {
+                if (matrix[tempVertex][j] > 0 && matrix[tempVertex][j] + searchTable[tempVertex] < searchTable[j]) {
+                    searchTable[j] = matrix[tempVertex][j] + searchTable[tempVertex];
+                }
+            }
+            vertexArray.shift();
+        }
+    }
+    return searchTable;
+};
+
+function getWeihgtLink(weight, ifDuplex){
+    var newLinkWeight = weight;
+    //if (ifDuplex != 'duplex'){
+    //    newLinkWeight *= 2;
+    //}
+    //if (ifSatelliteChannel){
+    //    newLinkWeight *= 3;
+    //}
+    return newLinkWeight;
+}
+

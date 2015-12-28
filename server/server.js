@@ -5,8 +5,9 @@ var myFunctions = require('./service'),
     port = 5656,
     fs = require('fs'),
     rootProject = "/home/vitalik/Projects/course_work_my/", //TODO найти лучшее решение
-    pathFilesData = path.join(rootProject + '/server/data'),
-    pathJsonFile = path.join(pathFilesData + '/graph.json'),
+    pathFilesData = path.join(rootProject + '/server/data/'),
+    nameCurrentFile = 'graph.json',
+    pathJsonFile = path.join(pathFilesData + nameCurrentFile),
     jsonfile = require('jsonfile'), // for usability read and write file
     bodyParser = require('body-parser'),
     dirPath = rootProject + 'server/data';
@@ -31,6 +32,10 @@ app.get('/*.js|json', function (req, res) {
 });
 
 app.get('/*.css', function (req, res) {
+    res.sendFile(path.join(rootProject + req.url));
+});
+
+app.get('/fonts/*', function (req, res) {
     res.sendFile(path.join(rootProject + req.url));
 });
 
@@ -81,13 +86,24 @@ app.post('/add/node', function (req, res) {
         //можно было через длино, но невозможно при удалении точек из середины
         //поэтому берем последнее имя и добавляем 1
         var numberNode = parseInt(json.nodes[json.nodes.length - 1].name) + 1;
+        var tmpX = 60;
+        var tmpY = 60;
+        var iteration = 0;
+        while (!checkDistance(json.nodes,tmpX, tmpY)) {
+            if (iteration > 100) {
+                console.log("it is not impossible get coordinates");
+                break;
+            }
+            tmpX += 20;
+            iteration++;
+        }
         json.nodes.push(
             {
                 "name": numberNode,
                 "group": 1,
                 "fixed": true,
-                "x": 60,
-                "y": 60
+                "x": tmpX,
+                "y": tmpY
             }
         );
         jsonfile.writeFile(pathJsonFile, json, function (err) {
@@ -174,7 +190,7 @@ app.post('/add/link', function (req, res) {
                 });
             });
         }
-        else{
+        else {
             res.statusCode = 400;
             res.send("error");
         }
@@ -207,7 +223,7 @@ app.post('/remove/link', function (req, res) {
                 });
             });
         }
-        else{
+        else {
             res.statusCode = 400;
             res.send("error");
         }
@@ -224,13 +240,18 @@ app.get('/files', function (req, res) {
     res.send(global.fileNameData);
 });
 
+app.get('/file/current', function (req, res) {
+    console.log("get name current file");
+    res.statusCode = 200;
+    res.send(nameCurrentFile);
+});
+
 app.post('/file', function (req, res) {
     console.log("change file");
-    console.log(req.body);
     if (req.body && req.body['file-graph']) {
-        pathJsonFile = path.join(pathFilesData + '/' + req.body['file-graph']);
+        pathJsonFile = path.join(pathFilesData + req.body['file-graph']);
+        nameCurrentFile = req.body['file-graph'];
         res.statusCode = 200;
-        console.log(pathJsonFile);
         res.send('successful');
     }
     else {

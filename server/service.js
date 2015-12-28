@@ -7,6 +7,9 @@
 var fs = require('fs');
 var path = require('path');
 
+function distanceBetweenPoint(x1,y1,x2,y2){
+    return Math.sqrt(Math.pow((x1 - x2),2) + Math.pow((y1 - y2),2));
+};
 
 global.getNumberNodeByName = function (json, name) {
     var length = json.length;
@@ -42,3 +45,14 @@ global.getNumberLinkByTrgAndSrc = function (json,target,source) {
     };
     return result;
 };
+
+global.checkDistance = function(nodes,x1, y1) {
+    //проходим по массиву нодов и проверяем растояния
+    var flag = true;
+    nodes.map(function (node) {
+        if (distanceBetweenPoint(x1, y1, node.x, node.y) < 50) {
+            flag = false;
+        }
+    });
+    return flag;
+}

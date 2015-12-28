@@ -7,6 +7,7 @@
 <script src="node_modules/d3/d3.js"></script>
 <script src="js/dest/jquery-1.11.3.min.js"></script>
 <script src="js/dest/handlebars-v4.0.5.js"></script>
+<script src="js/dest/bootstrap.min.js"></script>
 <script src="js/dest/scripts.js"></script>
 <link rel="stylesheet" href="css/main.css">
 <body>
@@ -20,67 +21,138 @@
     <option value="{{this}}">{{this}}</option>{{/each}}
 </script>
 
+<script class="js-templates" id="js-template-table" type="text/x-handlebars-template">
+    <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title">Подтверждение</h4>
+    </div>
+    <div class="modal-body">
+        <p>Граф в текущем файле будет утерят. Продолжить?</p>
+    </div>
+    <div class="modal-footer">
+        <button type="button" class="btn btn-success js-random-graph-confirmation" data-dismiss="modal">Да</button>
+        <button type="button" class="btn btn-danger cancel">Отменить</button>
+    </div>
+</script>
+
 <div class="wr-menu">
-    <div class="item-menu">
-        <button class="js-undo">Назад</button>
-        <button class="js-redo">Впред</button>
+    <div class="js-section section">
+        <div class="js-section-title section-title">Дополнительно<i class="fa"></i></div>
+        <div class="js-section-content section-content addition">
+            <div class="item-menu ">
+                <button class="js-undo btn btn-info">Назад</button>
+                <button class="js-redo btn btn-primary">Впред</button>
+            </div>
+            <div class="item-menu">
+                <button class="js-save save btn btn-success">Сохранить</button>
+            </div>
+            <!--<div class="item-menu">-->
+            <!--<button class="js-all-nodes-left">Подвинуть влево</button>-->
+            <!--</div>-->
+        </div>
     </div>
-    <div class="item-menu">
-        <form method="post" action="add/node" class="js-simple-form">
-            Добавление вершины
-            <br>
-            <button type="submit">Добавить</button>
-        </form>
+    <div class="js-section section">
+        <div class="js-section-title section-title">Работа с вершинами <i class="fa"></i></div>
+        <div class="js-section-content section-content">
+            <div class="item-menu">
+                <form method="post" action="add/node" class="js-simple-form">
+                    Добавление вершины
+                    <br>
+                    <button type="submit" class="btn btn-success">Добавить</button>
+                </form>
+            </div>
+            <div class="item-menu">
+                <form>
+                    Удаление вершины
+                    <br>
+                    Введите номер:
+                    <input type="text" name="idNode" class="form-control">
+                    <button class="js-remove-node btn btn-danger">Удалить</button>
+                </form>
+            </div>
+        </div>
     </div>
-    <div class="item-menu">
-        <form>
-            Удаление вершины
-            <br>
-            Введите номер:
-            <input type="text" name="idNode">
-            <br>
-            <button class="js-remove-node">Удалить</button>
-        </form>
+    <div class="js-section section">
+        <div class="js-section-title section-title">Работа с ребрами <i class="fa"></i></div>
+        <div class="js-section-content section-content">
+            <div class="item-menu">
+                <form method="post" class="add-link js-simple-form" action="add/link">
+                    Добавление ребра
+                    <br>
+                    Источник:
+                    <input type="text" name="source" class="form-control">
+                    Приемник:
+                    <input type="text" name="target" class="form-control">
+                    <div class="form-group">
+                        Вес
+                        <select name="weight" class="js-link-weight form-control" id="link-weight"></select>
+                    </div>
+                    <button type="submit" class="btn btn-success">Добавить</button>
+                </form>
+            </div>
+
+            <div class="item-menu">
+                <form method="post" class="remove-link js-simple-form" action="remove/link">
+                    Удаление ребра
+                    <br>
+                    Источник:
+                    <input type="text" name="source" class="form-control">
+                    Приемник:
+                    <input type="text" name="target" class="form-control">
+                    <button type="submit" class="btn btn-danger">Удалить</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="js-section section">
+        <div class="js-section-title section-title">Выбор графа<i class="fa"></i></div>
+        <div class="js-section-content section-content">
+            <div class="item-menu">
+                <div class="form-group">
+                    Выберете файл
+                    <select name="file-graph" class="js-file-graph form-control"></select>
+                </div>
+            </div>
+            <div class="item-menu">
+                <button class="js-random-graph btn btn-info">Случаный граф</button>
+            </div>
+        </div>
+    </div>
+    <div class="js-section section">
+        <div class="js-section-title section-title">Маршрутицазия<i class="fa"></i></div>
+        <div class="js-section-content section-content">
+            <div class="item-menu">
+                <button class="js-shortest-way btn btn-success">Кратчайший путь</button>
+            </div>
+        </div>
     </div>
 
-    <div class="item-menu">
-        <form method="post" class="add-link js-simple-form" action="add/link">
-            Добавление ребра
-            <br>
-            Источник:
-            <input type="text" name="source">
-            <br>
-            Приемник:
-            <input type="text" name="target">
-            <br>
-            <select name="weight" class="js-link-weight"></select>
-            <button type="submit">Добавить</button>
-        </form>
-    </div>
+</div>
 
-    <div class="item-menu">
-        <form method="post" class="remove-link js-simple-form" action="remove/link">
-            Удаление ребра
-            <br>
-            Источник:
-            <input type="text" name="source">
-            <br>
-            Приемник:
-            <input type="text" name="target">
-            <br>
-            <button type="submit">Удалить</button>
-        </form>
+<div class="modal-random-graph modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Подтверждение</h4>
+            </div>
+            <div class="modal-body">
+                <p>Граф в текущем файле будет утерят. Продолжить?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success js-random-graph-confirmation" data-dismiss="modal">Да</button>
+                <button type="button" class="btn btn-danger cancel">Отменить</button>
+            </div>
+        </div>
     </div>
+</div>
 
-    <div class="item-menu">
-        <button class="js-save">Сохранить расположение точек</button>
-    </div>
-    <div class="item-menu">
-        Выберете файл <br>
-        <select name="file-graph" class="js-file-graph"></select>
-    </div>
-    <div class="item-menu">
-        <button class="js-random-graph">Случаный граф</button>
+
+<div class="modal-table modal fade" tabindex="-1" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+        </div>
     </div>
 </div>
 </body>

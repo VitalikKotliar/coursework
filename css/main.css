@@ -1,6 +1,8 @@
+@import url(bootstrap.css);
+@import url(font-awesome.min.css);
 @import url(notification.css);
 body {
-  font-family: 'Helvetica',sans-serif;
+  font-family: 'Helvetica', sans-serif;
   height: 100vh;
   padding: 0;
   margin: 0;
@@ -20,12 +22,28 @@ body {
   position: fixed;
   top: 0;
   right: 0;
-  padding: 20px; }
+  padding: 20px;
+  width: 20%;
+  box-sizing: border-box; }
+  .wr-menu button {
+    margin: 5px; }
 
-.item-menu {
-  padding: 10px; }
+.section-content {
+  display: none; }
 
-.add-link input {
-  margin: 10px 0; }
+.section-title .fa {
+  float: right; }
+.section-title .fa:before {
+  content: "\f0fe"; }
+.section-title.on .fa:before {
+  content: "\f146"; }
+
+.addition {
+  text-align: center; }
+  .addition button {
+    width: 44%; }
+
+.item-menu button {
+  margin-left: 0; }
 
 /*# sourceMappingURL=main.css.map */

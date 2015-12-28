@@ -12,7 +12,7 @@
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
-    opacity: .8;
+    opacity: 1;
 }
 
 .notification:hover {
@@ -20,13 +20,16 @@
 }
 
 .notification.error {
-    background-color: red;
+    /*background-color: red;*/
+    background-color: #d86c6c;
 }
 
 .notification.success {
-    background-color: springgreen;
+    /*background-color: springgreen;*/
+    background-color: #80c978;
 }
 
 .notification.info {
-    background-color: black;
+    /*background-color: black;*/
+    background-color: #498adc;
 }
