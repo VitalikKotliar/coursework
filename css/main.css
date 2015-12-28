@@ -29,14 +29,17 @@ body {
     margin: 5px; }
 
 .section-content {
-  display: none; }
+  display: none;
+  font-size: 16px; }
 
-.section-title .fa {
-  float: right; }
-.section-title .fa:before {
-  content: "\f0fe"; }
-.section-title.on .fa:before {
-  content: "\f146"; }
+.section-title {
+  font-size: 18px; }
+  .section-title .fa {
+    float: right; }
+  .section-title .fa:before {
+    content: "\f0fe"; }
+  .section-title.on .fa:before {
+    content: "\f146"; }
 
 .addition {
   text-align: center; }

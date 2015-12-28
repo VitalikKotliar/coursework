@@ -22,16 +22,27 @@
 </script>
 
 <script class="js-templates" id="js-template-table" type="text/x-handlebars-template">
-    <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-        <h4 class="modal-title">Подтверждение</h4>
-    </div>
-    <div class="modal-body">
-        <p>Граф в текущем файле будет утерят. Продолжить?</p>
-    </div>
-    <div class="modal-footer">
-        <button type="button" class="btn btn-success js-random-graph-confirmation" data-dismiss="modal">Да</button>
-        <button type="button" class="btn btn-danger cancel">Отменить</button>
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">{{title}}</h4>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped table-bordered table-hover">
+                    {{#each data}}
+                    <tr>
+                        <td>{{@index}}</td>
+                        <td>{{this}}</td>
+                    </tr>
+                    {{/each}}
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger cancel">Закрыть</button>
+            </div>
+        </div>
     </div>
 </script>
 
@@ -121,7 +132,9 @@
     <div class="js-section section">
         <div class="js-section-title section-title">Маршрутицазия<i class="fa"></i></div>
         <div class="js-section-content section-content">
-            <div class="item-menu">
+            <div class="item-menu js-wr">
+                Введите номер вершины:
+                <input type="text" name="name-node" value="0" class="form-control">
                 <button class="js-shortest-way btn btn-success">Кратчайший путь</button>
             </div>
         </div>
@@ -133,14 +146,16 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
                 <h4 class="modal-title">Подтверждение</h4>
             </div>
             <div class="modal-body">
                 <p>Граф в текущем файле будет утерят. Продолжить?</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success js-random-graph-confirmation" data-dismiss="modal">Да</button>
+                <button type="button" class="btn btn-success js-random-graph-confirmation" data-dismiss="modal">Да
+                </button>
                 <button type="button" class="btn btn-danger cancel">Отменить</button>
             </div>
         </div>
@@ -149,10 +164,6 @@
 
 
 <div class="modal-table modal fade" tabindex="-1" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
 
-        </div>
-    </div>
 </div>
 </body>

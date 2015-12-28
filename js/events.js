@@ -4,7 +4,7 @@
  * Date: 23.12.15
  */
 
-function initClickNode(){
+function initClickNode() {
     var nodeCircle = d3.selectAll('.node');
     nodeCircle.on('click', function () {
         saveGraphOnSever();
@@ -31,7 +31,7 @@ addEventListener("DOMContentLoaded", function () {
             renderGraph(data);
         }).error(function () {
             console.log("error");
-            notification.create("Ошибка","error");
+            notification.create("Ошибка", "error");
         });
     });
 
@@ -47,7 +47,7 @@ addEventListener("DOMContentLoaded", function () {
 
         var namesNodes = $(this).closest('form').find('input').val();
 
-        removeNodes(global.graph,namesNodes);
+        removeNodes(global.graph, namesNodes);
 
         saveGraphOnSever();
     });
@@ -97,23 +97,30 @@ addEventListener("DOMContentLoaded", function () {
     //});
 
 
-    $('.js-random-graph').on('click',function(){
+    $('.js-random-graph').on('click', function () {
         $('.modal-random-graph').modal('toggle');
     });
 
-    $('.js-random-graph-confirmation').on('click',function(){
+    $('.js-random-graph-confirmation').on('click', function () {
         renderGraph(createRandomGraph());
         saveGraphOnSever();
     });
 
-    $('.cancel').on('click',function(){
-        $('.modal').modal('hide');
+    $('body').on('click','.cancel', function () {
+        $(this).closest('.modal').modal('hide');
     });
 
-    $('.js-shortest-way').on('click',function(){
-        var nodeNumber = getNumberNodeByName( global.graph.nodes,'1');
-        console.log(nodeNumber);
-        console.log(searchShortestPathes(nodeNumber, global.graph.nodes.length, global.graph.graphMatrix));
+    $('.js-shortest-way').on('click', function () {
+        var valInput = $(this).closest('.js-wr').find('input').val(),
+            nodeNumber = getNumberNodeByName(global.graph.nodes, valInput),
+            shortestPathes = searchShortestPathes(nodeNumber, global.graph.nodes.length, global.graph.graphMatrix),
+            $modalTable = $('.modal-table');
+
+        $modalTable.empty().append(global.templates["js-template-table"]({
+            data: shortestPathes,
+            title: 'Таблица маршрутизации для узла № ' + valInput
+        }));
+        $modalTable.modal('toggle');
     });
 
 
@@ -121,11 +128,11 @@ addEventListener("DOMContentLoaded", function () {
      * MENU UI
      */
 
-    $('.js-section-title').on('click',function(){
+    $('.js-section-title').on('click', function () {
         var $this = $(this);
         $this.toggleClass('on')
             .closest('.js-section').find('.js-section-content')
-            .animate({height:'toggle'},350);
+            .animate({height: 'toggle'}, 350);
     });
 
 });
