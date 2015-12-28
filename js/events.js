@@ -4,18 +4,12 @@
  * Date: 23.12.15
  */
 
-function initClickNode() {
-    var nodeCircle = d3.selectAll('.node');
-    nodeCircle.on('click', function () {
-        saveGraphOnSever();
-    })
-};
-
 addEventListener("DOMContentLoaded", function () {
 
-    var $forms = $('.js-simple-form');
 
-    $forms.on("submit", function (e) {
+    var $body = $('body');
+
+    $body.on("submit", '.js-simple-form', function (e) {
         global.backup.addBackup();
 
         e.preventDefault();
@@ -28,6 +22,8 @@ addEventListener("DOMContentLoaded", function () {
             data: $this.serialize(),
             cache: false
         }).done(function (data) {
+            $('.modal').modal('hide');
+            console.log(data);
             renderGraph(data);
         }).error(function () {
             console.log("error");
@@ -51,6 +47,7 @@ addEventListener("DOMContentLoaded", function () {
 
         saveGraphOnSever();
     });
+
     $('.js-file-graph').on('change', function (e) {
         global.backup.backupData = [];
 
@@ -106,7 +103,7 @@ addEventListener("DOMContentLoaded", function () {
         saveGraphOnSever();
     });
 
-    $('body').on('click','.cancel', function () {
+    $('body').on('click', '.cancel', function () {
         $(this).closest('.modal').modal('hide');
     });
 
@@ -133,6 +130,45 @@ addEventListener("DOMContentLoaded", function () {
         $this.toggleClass('on')
             .closest('.js-section').find('.js-section-content')
             .animate({height: 'toggle'}, 350);
+    });
+
+
+    //var nodeCircle = d3.selectAll('.node');
+    //nodeCircle.on('click', function () {
+    //    saveGraphOnSever();
+    //});
+
+    /**
+     * HANDLERS EVENT ON GRAPH
+     *
+     */
+
+    var $svg = $('svg');
+
+    $svg.on('click', '.node', function () {
+        saveGraphOnSever();
+    });
+    //$('.node')
+    //    .data('toggle', 'popover')
+    //    .data('title', 'Popover title')
+    //    .data('content', "And here's some amazing content. It's very engaging. Right?").popover();
+
+    $svg.on('click', '.link', function () {
+        var $this = $(this),
+            $modalParamLinks = $('.js-modal-link-parameters'),
+            idLink = $(this).data('id'),
+            link = getLinkById(idLink);
+
+        var newVar = {
+            linkName: link.source.name + ' - ' + link.target.name,
+            idLink: idLink,
+            isDuplex:link.isDuplex,
+            isHalfDuplex: link.isDuplex ? 0 : 1
+        };
+        console.log(newVar.isDuplex);
+        console.log(newVar.isHalfDuplex);
+        $modalParamLinks.empty().append(global.templates["js-modal-link-parameters"](newVar));
+        $modalParamLinks.modal('toggle');
     });
 
 });

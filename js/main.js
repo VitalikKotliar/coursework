@@ -5,8 +5,8 @@
  */
 var inputData = {
     weights: [3, 4, 5, 7, 11, 12, 15, 17, 19, 24],
-    minColLink:4,
-    colNodeInRegionNetwork:12
+    minColLink: 4,
+    colNodeInRegionNetwork: 12
 };
 
 var global = {
@@ -51,7 +51,7 @@ var global = {
 function initWindow() {
     global.height = window.innerHeight;
     global.width = window.innerWidth;
-    global.svgWidth = window.innerWidth/100 * 80;
+    global.svgWidth = window.innerWidth / 100 * 80;
 
     global.force = d3.layout.force()
         //.charge(-120)
@@ -82,21 +82,27 @@ function renderGraph(jsonGraph) {
         .data(global.graph.links)
         .enter().append("g")
         .attr('data-id', function (d) {
-            return d.source.id + "-" + d.target.id;
+            return d.id;
+        })
+        .attr('class', function (d) {
+            var classes = "link ";
+            d.isDuplex == 1 ? classes += "duplex" : classes += "half-duplex";
+            return classes;
         })
 
     var linkLine = linksWrapper
         .append('line')
         .attr("class", "link-line");
-        //.style("stroke-width", function (d) {
-        //    return d.weight / 5;
-        //});
+    //.style("stroke-width", function (d) {
+    //    return d.weight / 5;
+    //});
 
     //append element text in each linkWrapper
     var linkText = linksWrapper
         .append('text')
         .html(function (d) {
-            return d.weight; //get from current object link, that we take from json
+            var weight = d.weight;
+            return d.isDuplex == 1 ? weight*2 : weight;
         })
         .attr("class", "link-text");
 
@@ -106,7 +112,7 @@ function renderGraph(jsonGraph) {
         .data(global.graph.nodes)
         .enter().append("g").attr('data-id', function (d) {
             return d.id;
-        }).attr('class','node')
+        }).attr('class', 'node')
         .style("fill", function (d) {
             return color(d.group);
         })
@@ -167,9 +173,6 @@ function renderGraph(jsonGraph) {
 function initMenu() {
 
 
-
-
-
     var $selectFiles = $('.js-file-graph');
     var $selectWeight = $('.js-link-weight');
 
@@ -197,5 +200,4 @@ addEventListener("DOMContentLoaded", function () {
     initMenu();
     initWindow();
     renderGraph();
-    initClickNode(); // добавляем событие клика после рендера
 });

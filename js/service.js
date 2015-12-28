@@ -84,6 +84,27 @@ function getNumberNodeByName(json, id) {
     return result;
 };
 
+function getNodeByName(name) {
+    var length = global.graph.nodes.length;
+    for (var i = 0; i < length; i++) {
+        if (global.graph.nodes[i].name == name){
+            return global.graph.nodes[i];
+        }
+    };
+    return undefined;
+};
+
+function getLinkById(id) {
+    var length = global.graph.links.length;
+    for (var i = 0; i < length; i++) {
+        if (global.graph.links[i].id == id){
+            return global.graph.links[i];
+        }
+    };
+    return undefined;
+};
+
+
 
 function removeNodes(graph, namesNodes) {
 
@@ -202,7 +223,6 @@ function searchShortestPathes(start, nodesCount, matrix) {
     //    var array = this.dataSet.nodes;
     //    var newVertex = array.splice(start,1);
     //    array.unshift(newVertex[0]);
-
     var array = global.graph.nodes;
 
     var searchTable = [];

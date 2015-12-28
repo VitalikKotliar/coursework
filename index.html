@@ -46,6 +46,40 @@
     </div>
 </script>
 
+
+<script class="js-templates" id="js-modal-link-parameters" type="text/x-handlebars-template">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Параметры узла № {{linkName}}</h4>
+            </div>
+            <form action="/link/parameters" method="post" class="js-simple-form">
+                <div class="modal-body">
+                    <input type="hidden" name="id-link" value="{{idLink}}">
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="type" value="1" {{#if isDuplex}}checked{{/if}}>
+                            Дуплекс
+                        </label>
+                    </div>
+                    <div class="radio">
+                        <label>
+                            <input type="radio" name="type" value="0" {{#if isHalfDuplex}}checked{{/if}}>
+                            Полудуплекс
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                    <button type="button" class="btn btn-danger cancel">Закрыть</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</script>
+
 <div class="wr-menu">
     <div class="js-section section">
         <div class="js-section-title section-title">Дополнительно<i class="fa"></i></div>
@@ -139,6 +173,20 @@
             </div>
         </div>
     </div>
+    <div class="js-section section">
+        <div class="js-section-title section-title">Попытка<i class="fa"></i></div>
+        <div class="js-section-content section-content">
+            <div class="item-menu js-wr">
+                <button id="lolka" data-toggle="popover" title="Popover title"
+                        data-content="And here's some amazing content. It's very engaging. Right?">Проба
+                </button>
+                <button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title"
+                        data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle
+                    popover
+                </button>
+            </div>
+        </div>
+    </div>
 
 </div>
 
@@ -156,14 +204,20 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-success js-random-graph-confirmation" data-dismiss="modal">Да
                 </button>
-                <button type="button" class="btn btn-danger cancel">Отменить</button>
+                <button type="button" class="btn btn-danger cancel">Закрыть</button>
+
             </div>
         </div>
+
     </div>
 </div>
 
 
 <div class="modal-table modal fade" tabindex="-1" role="dialog">
+
+</div>
+
+<div class="js-modal-link-parameters modal fade" tabindex="-1" role="dialog">
 
 </div>
 </body>

@@ -14,9 +14,14 @@ body {
   fill: #fff;
 }
 
-.link-line {
-  stroke: #999;
-  stroke-width: 1px;
+.link {
+  .link-line{
+    stroke-width: 1px;
+    stroke: #999;
+  }
+  &.half-duplex .link-line{
+    stroke-dasharray:4,4;
+  }
 }
 
 .link-text {
@@ -29,6 +34,7 @@ body {
   right: 0;
   padding: 20px;
   width: 20%;
+  min-width: 250px;
   box-sizing: border-box;
   button {
     margin: 5px;
@@ -46,6 +52,7 @@ body {
 
 .section-title {
   font-size: 18px;
+  cursor: pointer;
   .fa {
     float: right;
   }

@@ -89,7 +89,7 @@ app.post('/add/node', function (req, res) {
         var tmpX = 60;
         var tmpY = 60;
         var iteration = 0;
-        while (!checkDistance(json.nodes,tmpX, tmpY)) {
+        while (!checkDistance(json.nodes, tmpX, tmpY)) {
             if (iteration > 100) {
                 console.log("it is not impossible get coordinates");
                 break;
@@ -259,6 +259,39 @@ app.post('/file', function (req, res) {
     }
 });
 
+
+/**
+ * SET LINK PARAMETERS
+ */
+
+app.post('/link/parameters', function (req, res) {
+    console.log("set parameters node");
+    jsonfile.readFile(pathJsonFile, function (err, obj) {
+        var idLink = req.body["id-link"];
+
+        if (idLink) {
+            var length = obj.links.length;
+            var link = {};
+            for (var i = 0; i < length; i++) {
+                if (obj.links[i].id == idLink) {
+                    link = obj.links[i];
+                }
+            };
+
+            link.isDuplex = req.body["type"];
+            jsonfile.writeFile(pathJsonFile, obj, function (err) {
+                if (err) res.statusCode = 404;
+                //возвращаем на клиет весь джсон
+                jsonfile.readFile(pathJsonFile, function (err, obj) {
+                    res.statusCode = 200;
+                    res.send(obj);
+                });
+            });
+        }
+        else
+            res.statusCode = 400;
+    });
+});
 
 app.listen(port);
 

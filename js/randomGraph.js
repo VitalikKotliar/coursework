@@ -9,7 +9,7 @@ function createRandomGraph() {
         colNodeInRegionNetwork = 12,
         nameNode = 0,
         idNode = 0,
-        padding = getWidthInProcent(15), //отступ от краев 15 проценво
+        padding = getWidthInProcent(10), //отступ от краев 10 проценво
         topBorder = padding,
         bottomBorder = global.height - padding,
         leftBorder = padding,
@@ -92,6 +92,8 @@ function createRandomGraph() {
             link.source = source;
             link.target = target;
             link.weight = ranWeight;
+            link.id = source + '-' + target;
+            link.isDuplex = getRandomInt(0, 2);
             graph.links.push(link);
         }
 
@@ -165,7 +167,6 @@ function createRandomGraph() {
                     colLink++;
                 }
             };
-
 
 
             // + 2 потому что две центральных

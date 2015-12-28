@@ -11,9 +11,11 @@ body {
 .node-text {
   fill: #fff; }
 
-.link-line {
-  stroke: #999;
-  stroke-width: 1px; }
+.link .link-line {
+  stroke-width: 1px;
+  stroke: #999; }
+.link.half-duplex .link-line {
+  stroke-dasharray: 4,4; }
 
 .link-text {
   fill: #000; }
@@ -24,6 +26,7 @@ body {
   right: 0;
   padding: 20px;
   width: 20%;
+  min-width: 250px;
   box-sizing: border-box; }
   .wr-menu button {
     margin: 5px; }
@@ -33,7 +36,8 @@ body {
   font-size: 16px; }
 
 .section-title {
-  font-size: 18px; }
+  font-size: 18px;
+  cursor: pointer; }
   .section-title .fa {
     float: right; }
   .section-title .fa:before {

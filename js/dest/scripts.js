@@ -4,18 +4,12 @@
  * Date: 23.12.15
  */
 
-function initClickNode() {
-    var nodeCircle = d3.selectAll('.node');
-    nodeCircle.on('click', function () {
-        saveGraphOnSever();
-    })
-};
-
 addEventListener("DOMContentLoaded", function () {
 
-    var $forms = $('.js-simple-form');
 
-    $forms.on("submit", function (e) {
+    var $body = $('body');
+
+    $body.on("submit", '.js-simple-form', function (e) {
         global.backup.addBackup();
 
         e.preventDefault();
@@ -28,6 +22,8 @@ addEventListener("DOMContentLoaded", function () {
             data: $this.serialize(),
             cache: false
         }).done(function (data) {
+            $('.modal').modal('hide');
+            console.log(data);
             renderGraph(data);
         }).error(function () {
             console.log("error");
@@ -51,6 +47,7 @@ addEventListener("DOMContentLoaded", function () {
 
         saveGraphOnSever();
     });
+
     $('.js-file-graph').on('change', function (e) {
         global.backup.backupData = [];
 
@@ -106,7 +103,7 @@ addEventListener("DOMContentLoaded", function () {
         saveGraphOnSever();
     });
 
-    $('body').on('click','.cancel', function () {
+    $('body').on('click', '.cancel', function () {
         $(this).closest('.modal').modal('hide');
     });
 
@@ -135,6 +132,45 @@ addEventListener("DOMContentLoaded", function () {
             .animate({height: 'toggle'}, 350);
     });
 
+
+    //var nodeCircle = d3.selectAll('.node');
+    //nodeCircle.on('click', function () {
+    //    saveGraphOnSever();
+    //});
+
+    /**
+     * HANDLERS EVENT ON GRAPH
+     *
+     */
+
+    var $svg = $('svg');
+
+    $svg.on('click', '.node', function () {
+        saveGraphOnSever();
+    });
+    //$('.node')
+    //    .data('toggle', 'popover')
+    //    .data('title', 'Popover title')
+    //    .data('content', "And here's some amazing content. It's very engaging. Right?").popover();
+
+    $svg.on('click', '.link', function () {
+        var $this = $(this),
+            $modalParamLinks = $('.js-modal-link-parameters'),
+            idLink = $(this).data('id'),
+            link = getLinkById(idLink);
+
+        var newVar = {
+            linkName: link.source.name + ' - ' + link.target.name,
+            idLink: idLink,
+            isDuplex:link.isDuplex,
+            isHalfDuplex: link.isDuplex ? 0 : 1
+        };
+        console.log(newVar.isDuplex);
+        console.log(newVar.isHalfDuplex);
+        $modalParamLinks.empty().append(global.templates["js-modal-link-parameters"](newVar));
+        $modalParamLinks.modal('toggle');
+    });
+
 });
 
 /**
@@ -144,8 +180,8 @@ addEventListener("DOMContentLoaded", function () {
  */
 var inputData = {
     weights: [3, 4, 5, 7, 11, 12, 15, 17, 19, 24],
-    minColLink:4,
-    colNodeInRegionNetwork:12
+    minColLink: 4,
+    colNodeInRegionNetwork: 12
 };
 
 var global = {
@@ -190,7 +226,7 @@ var global = {
 function initWindow() {
     global.height = window.innerHeight;
     global.width = window.innerWidth;
-    global.svgWidth = window.innerWidth/100 * 80;
+    global.svgWidth = window.innerWidth / 100 * 80;
 
     global.force = d3.layout.force()
         //.charge(-120)
@@ -221,21 +257,27 @@ function renderGraph(jsonGraph) {
         .data(global.graph.links)
         .enter().append("g")
         .attr('data-id', function (d) {
-            return d.source.id + "-" + d.target.id;
+            return d.id;
+        })
+        .attr('class', function (d) {
+            var classes = "link ";
+            d.isDuplex == 1 ? classes += "duplex" : classes += "half-duplex";
+            return classes;
         })
 
     var linkLine = linksWrapper
         .append('line')
         .attr("class", "link-line");
-        //.style("stroke-width", function (d) {
-        //    return d.weight / 5;
-        //});
+    //.style("stroke-width", function (d) {
+    //    return d.weight / 5;
+    //});
 
     //append element text in each linkWrapper
     var linkText = linksWrapper
         .append('text')
         .html(function (d) {
-            return d.weight; //get from current object link, that we take from json
+            var weight = d.weight;
+            return d.isDuplex == 1 ? weight*2 : weight;
         })
         .attr("class", "link-text");
 
@@ -245,7 +287,7 @@ function renderGraph(jsonGraph) {
         .data(global.graph.nodes)
         .enter().append("g").attr('data-id', function (d) {
             return d.id;
-        }).attr('class','node')
+        }).attr('class', 'node')
         .style("fill", function (d) {
             return color(d.group);
         })
@@ -306,9 +348,6 @@ function renderGraph(jsonGraph) {
 function initMenu() {
 
 
-
-
-
     var $selectFiles = $('.js-file-graph');
     var $selectWeight = $('.js-link-weight');
 
@@ -336,7 +375,6 @@ addEventListener("DOMContentLoaded", function () {
     initMenu();
     initWindow();
     renderGraph();
-    initClickNode(); // добавляем событие клика после рендера
 });
 /**
  * User: Vitalik Kotliar
@@ -431,7 +469,7 @@ function createRandomGraph() {
         colNodeInRegionNetwork = 12,
         nameNode = 0,
         idNode = 0,
-        padding = getWidthInProcent(15), //отступ от краев 15 проценво
+        padding = getWidthInProcent(10), //отступ от краев 10 проценво
         topBorder = padding,
         bottomBorder = global.height - padding,
         leftBorder = padding,
@@ -514,6 +552,8 @@ function createRandomGraph() {
             link.source = source;
             link.target = target;
             link.weight = ranWeight;
+            link.id = source + '-' + target;
+            link.isDuplex = getRandomInt(0, 2);
             graph.links.push(link);
         }
 
@@ -587,7 +627,6 @@ function createRandomGraph() {
                     colLink++;
                 }
             };
-
 
 
             // + 2 потому что две центральных
@@ -695,6 +734,27 @@ function getNumberNodeByName(json, id) {
     };
     return result;
 };
+
+function getNodeByName(name) {
+    var length = global.graph.nodes.length;
+    for (var i = 0; i < length; i++) {
+        if (global.graph.nodes[i].name == name){
+            return global.graph.nodes[i];
+        }
+    };
+    return undefined;
+};
+
+function getLinkById(id) {
+    var length = global.graph.links.length;
+    for (var i = 0; i < length; i++) {
+        if (global.graph.links[i].id == id){
+            return global.graph.links[i];
+        }
+    };
+    return undefined;
+};
+
 
 
 function removeNodes(graph, namesNodes) {
@@ -814,7 +874,6 @@ function searchShortestPathes(start, nodesCount, matrix) {
     //    var array = this.dataSet.nodes;
     //    var newVertex = array.splice(start,1);
     //    array.unshift(newVertex[0]);
-
     var array = global.graph.nodes;
 
     var searchTable = [];
