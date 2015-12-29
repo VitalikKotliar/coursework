@@ -18,7 +18,11 @@ body {
   stroke-dasharray: 4,4; }
 
 .link-text {
-  fill: #000; }
+  fill: #000;
+  cursor: pointer; }
+
+.node-text {
+  cursor: pointer; }
 
 .wr-menu {
   position: fixed;

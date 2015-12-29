@@ -145,8 +145,22 @@ addEventListener("DOMContentLoaded", function () {
 
     var $svg = $('svg');
 
+    //$svg.on('click', '.node', function () {
+    //    saveGraphOnSever();
+    //});
+
     $svg.on('click', '.node', function () {
-        saveGraphOnSever();
+        var idNode = $(this).data('id'),
+            nodeName = $(this).data('name'),
+            $modalNodeParam = $('.js-modal-node-parameters'),
+            messageLength = $(this).data('message-length') || inputData.defaultMessageLength;
+
+        $modalNodeParam.empty().append(global.templates["js-modal-node-parameters"]({
+            idNode:idNode,
+            nodeName:nodeName,
+            messageLength:messageLength
+        }));
+        $modalNodeParam.modal('toggle');
     });
     //$('.node')
     //    .data('toggle', 'popover')
@@ -162,13 +176,32 @@ addEventListener("DOMContentLoaded", function () {
         var newVar = {
             linkName: link.source.name + ' - ' + link.target.name,
             idLink: idLink,
-            isDuplex:link.isDuplex,
+            isDuplex: link.isDuplex,
             isHalfDuplex: link.isDuplex ? 0 : 1
         };
-        console.log(newVar.isDuplex);
-        console.log(newVar.isHalfDuplex);
         $modalParamLinks.empty().append(global.templates["js-modal-link-parameters"](newVar));
         $modalParamLinks.modal('toggle');
     });
 
+    /**
+     * handlers for nodes parametrs in modal window
+     */
+
+    $body.on('click', '.js-table-shortest-way', function () {
+        var $this = $(this),
+            valInput = $this.closest('form').find('input[name="name-node"]').val(),
+            nodeNumber = getNumberNodeByName(global.graph.nodes, valInput),
+            shortestPathes = searchShortestPathes(nodeNumber, global.graph.nodes.length, global.graph.graphMatrix),
+            $modalTable = $('.modal-table');
+
+        $(this).closest('.modal').modal('hide');
+
+        setTimeout(function(){ //задержка для того что прошлый попап успел скрыться
+            $modalTable.empty().append(global.templates["js-template-table"]({
+                data: shortestPathes,
+                title: 'Таблица маршрутизации для узла № ' + valInput
+            }));
+            $modalTable.modal('toggle');
+        },800);
+    });
 });

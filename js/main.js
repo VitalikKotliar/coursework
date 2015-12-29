@@ -6,7 +6,9 @@
 var inputData = {
     weights: [3, 4, 5, 7, 11, 12, 15, 17, 19, 24],
     minColLink: 4,
-    colNodeInRegionNetwork: 12
+    colNodeInRegionNetwork: 12,
+    defaultMessageLength:1500,
+    maxSizePackage:1000
 };
 
 var global = {
@@ -112,7 +114,14 @@ function renderGraph(jsonGraph) {
         .data(global.graph.nodes)
         .enter().append("g").attr('data-id', function (d) {
             return d.id;
-        }).attr('class', 'node')
+        })
+        .attr('class', 'node')
+        .attr('data-name', function (d) {
+            return d.name;
+        })
+        .attr('data-message-length', function (d) {
+            return d['message-length'];
+        })
         .style("fill", function (d) {
             return color(d.group);
         })

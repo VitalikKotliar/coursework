@@ -47,13 +47,42 @@
 </script>
 
 
+<script class="js-templates" id="js-modal-node-parameters" type="text/x-handlebars-template">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">Параметры узла № {{nodeName}}</h4>
+            </div>
+            <form action="/node/parameters" method="post" class="js-simple-form">
+                <div class="modal-body">
+                    <input type="hidden" name="id-node" value="{{idNode}}">
+                    <input type="hidden" name="name-node" value="{{nodeName}}">
+                    <div class="form-group">
+                        <label for="message-length">Длина сообщения:</label>
+                        <input type="text" class="form-control" name="message-length" value="{{messageLength}}" id="message-length">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <!--<button type="button" class="btn btn-info js-table-time">Таблица времени отправки сообщений с узла</button>-->
+                    <button type="button" class="btn btn-info js-table-shortest-way">Таблица маршрутизации</button>
+                    <button type="submit" class="btn btn-success">Сохранить</button>
+                    <button type="button" class="btn btn-danger cancel">Закрыть</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</script>
+
+
 <script class="js-templates" id="js-modal-link-parameters" type="text/x-handlebars-template">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Параметры узла № {{linkName}}</h4>
+                <h4 class="modal-title">Параметры ребра {{linkName}}</h4>
             </div>
             <form action="/link/parameters" method="post" class="js-simple-form">
                 <div class="modal-body">
@@ -173,20 +202,20 @@
             </div>
         </div>
     </div>
-    <div class="js-section section">
-        <div class="js-section-title section-title">Попытка<i class="fa"></i></div>
-        <div class="js-section-content section-content">
-            <div class="item-menu js-wr">
-                <button id="lolka" data-toggle="popover" title="Popover title"
-                        data-content="And here's some amazing content. It's very engaging. Right?">Проба
-                </button>
-                <button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title"
-                        data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle
-                    popover
-                </button>
-            </div>
-        </div>
-    </div>
+    <!--<div class="js-section section">-->
+    <!--<div class="js-section-title section-title">Попытка<i class="fa"></i></div>-->
+    <!--<div class="js-section-content section-content">-->
+    <!--<div class="item-menu js-wr">-->
+    <!--<button id="lolka" data-toggle="popover" title="Popover title"-->
+    <!--data-content="And here's some amazing content. It's very engaging. Right?">Проба-->
+    <!--</button>-->
+    <!--<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title"-->
+    <!--data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle-->
+    <!--popover-->
+    <!--</button>-->
+    <!--</div>-->
+    <!--</div>-->
+    <!--</div>-->
 
 </div>
 
@@ -218,6 +247,10 @@
 </div>
 
 <div class="js-modal-link-parameters modal fade" tabindex="-1" role="dialog">
+
+</div>
+
+<div class="js-modal-node-parameters modal fade" tabindex="-1" role="dialog">
 
 </div>
 </body>

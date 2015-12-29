@@ -265,7 +265,7 @@ app.post('/file', function (req, res) {
  */
 
 app.post('/link/parameters', function (req, res) {
-    console.log("set parameters node");
+    console.log("set parameters link");
     jsonfile.readFile(pathJsonFile, function (err, obj) {
         var idLink = req.body["id-link"];
 
@@ -279,6 +279,40 @@ app.post('/link/parameters', function (req, res) {
             };
 
             link.isDuplex = req.body["type"];
+            jsonfile.writeFile(pathJsonFile, obj, function (err) {
+                if (err) res.statusCode = 404;
+                //возвращаем на клиет весь джсон
+                jsonfile.readFile(pathJsonFile, function (err, obj) {
+                    res.statusCode = 200;
+                    res.send(obj);
+                });
+            });
+        }
+        else
+            res.statusCode = 400;
+    });
+});
+
+/**
+ * SET NODE PARAMETRS
+ */
+
+app.post('/node/parameters', function (req, res) {
+    console.log("set parameters node");
+    jsonfile.readFile(pathJsonFile, function (err, obj) {
+        var nodeId = req.body["id-node"];
+
+        if (nodeId) {//TODO вынести в отдельную фукцию поиск нода по айди
+            var length = obj.nodes.length;
+            var node = {};
+            for (var i = 0; i < length; i++) {
+                if (obj.nodes[i].id == nodeId) {
+                    node = obj.nodes[i];
+                }
+            };
+
+            node['message-length'] = req.body["message-length"];
+
             jsonfile.writeFile(pathJsonFile, obj, function (err) {
                 if (err) res.statusCode = 404;
                 //возвращаем на клиет весь джсон
