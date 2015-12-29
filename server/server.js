@@ -311,7 +311,7 @@ app.post('/node/parameters', function (req, res) {
                 }
             };
 
-            node['message-length'] = req.body["message-length"];
+            node['messageLength'] = req.body["messageLength"];
 
             jsonfile.writeFile(pathJsonFile, obj, function (err) {
                 if (err) res.statusCode = 404;

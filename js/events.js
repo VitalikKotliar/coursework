@@ -145,16 +145,15 @@ addEventListener("DOMContentLoaded", function () {
 
     var $svg = $('svg');
 
-    //$svg.on('click', '.node', function () {
-    //    saveGraphOnSever();
-    //});
-
     $svg.on('click', '.node', function () {
+        saveGraphOnSever();
+    });
+
+    $svg.on('dblclick', '.node', function () {
         var idNode = $(this).data('id'),
             nodeName = $(this).data('name'),
             $modalNodeParam = $('.js-modal-node-parameters'),
-            messageLength = $(this).data('message-length') || inputData.defaultMessageLength;
-
+            messageLength = $(this).data('messageLength') || inputData.defaultMessageLength;
         $modalNodeParam.empty().append(global.templates["js-modal-node-parameters"]({
             idNode:idNode,
             nodeName:nodeName,
@@ -200,6 +199,48 @@ addEventListener("DOMContentLoaded", function () {
             $modalTable.empty().append(global.templates["js-template-table"]({
                 data: shortestPathes,
                 title: 'Таблица маршрутизации для узла № ' + valInput
+            }));
+            $modalTable.modal('toggle');
+        },800);
+    });
+
+    $body.on('click', '.js-table-time', function () {
+        var $this = $(this),
+            nodeName = $this.closest('form').find('input[name="name-node"]').val(),
+            nodeId = $this.closest('form').find('input[name="id-node"]').val(),
+            messageLength = $this.closest('form').find('input[name="messageLength"]').val(),
+            $modalTable = $('.js-modal-table-time');
+
+        $(this).closest('.modal').modal('hide');
+        var node = getNodeById(nodeId);
+
+
+        var arrDetagram1050 = getTimeSendPackage(nodeId, 1050, messageLength, 0); //datagrams
+        var arrDetagram2050 =  getTimeSendPackage(nodeId, 2050, messageLength, 0); //datagrams
+        var arrDetagram3050 = getTimeSendPackage(nodeId, 3050, messageLength, 0); //datagrams
+        var arrLogic1050 = getTimeSendPackage(nodeId, 1050, messageLength, 0); //logic
+        var arrLogic2050 =  getTimeSendPackage(nodeId, 2050, messageLength, 0); //logic
+        var arrLogic3050 = getTimeSendPackage(nodeId, 3050, messageLength, 0); //logic
+
+        var length = arrDetagram1050.length;
+        var tmpObj = {};
+        for (var i = 0; i < length; i++) {
+            tmpObj[i] = {};
+            var tmp = tmpObj[i];
+            tmp.nodeName = i;
+            tmp.arrDetagram1050 = arrDetagram1050[i];
+            tmp.arrDetagram2050 = arrDetagram2050[i];
+            tmp.arrDetagram3050 = arrDetagram3050[i];
+            tmp.arrLogic1050 = arrLogic1050[i];
+            tmp.arrLogic2050 = arrLogic2050[i];
+            tmp.arrLogic3050 = arrLogic3050[i];
+        }
+
+        setTimeout(function(){ //задержка для того что прошлый попап успел скрыться
+            $modalTable.empty().append(global.templates["js-modal-table-time"]({
+                data: tmpObj,
+                nodeName: nodeName,
+                messageLength:messageLength
             }));
             $modalTable.modal('toggle');
         },800);

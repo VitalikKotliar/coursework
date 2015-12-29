@@ -92,8 +92,9 @@ function createRandomGraph() {
             link.source = source;
             link.target = target;
             link.weight = ranWeight;
-            link.id = source + '-' + target;
             link.isDuplex = getRandomInt(0, 2);
+            link.absoluteWeight = (link.isDuplex == 1) ? link.weight*2 : link.weight;
+            link.id = source + '-' + target;
             graph.links.push(link);
         }
 

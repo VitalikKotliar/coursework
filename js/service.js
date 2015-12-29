@@ -13,12 +13,12 @@ function getRandomInt(min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
 }
 
-function distanceBetweenPoint(x1,y1,x2,y2){
-    return Math.sqrt(Math.pow((x1 - x2),2) + Math.pow((y1 - y2),2));
+function distanceBetweenPoint(x1, y1, x2, y2) {
+    return Math.sqrt(Math.pow((x1 - x2), 2) + Math.pow((y1 - y2), 2));
 };
 
 
-function getWidthInProcent(procent){
+function getWidthInProcent(procent) {
     return global.svgWidth / 100 * procent;
 };
 
@@ -36,11 +36,11 @@ function saveGraphOnSever() {
         dataType: 'json',
         contentType: 'application/json; charset=utf-8',
         data: JSON.stringify(combineGraph(global.graph)),
-        async:false,
+        async: false,
         cache: false
     }).done(function (data) {
         graph = data;
-        notification.create("Сохранено",'info');
+        notification.create("Сохранено", 'info');
     }).error(function () {
         console.log("error");
     });
@@ -48,26 +48,25 @@ function saveGraphOnSever() {
 }
 
 
-
 /**
  *
  * ADDITIONAL FUNCTION
  */
 
-function clone(obj){
-    if(obj == null || typeof(obj) != 'object')
+function clone(obj) {
+    if (obj == null || typeof(obj) != 'object')
         return obj;
     var temp = new obj.constructor();
-    for(var key in obj)
+    for (var key in obj)
         temp[key] = clone(obj[key]);
     return temp;
 }
 
-function combineGraph(graph){
+function combineGraph(graph) {
     //перед отправкрй нужно преобразовать json, в ребрах заменить ноуд, с  объекта этой ноды целиком на ее индекс
     //  делаем через функцию клонирования, ато задевает текущую конфигурацию графа
     var tmpGraph = clone(graph);
-    for (var i=0; i < tmpGraph.links.length;i++){
+    for (var i = 0; i < tmpGraph.links.length; i++) {
         tmpGraph.links[i].target = tmpGraph.links[i].target.index;
         tmpGraph.links[i].source = parseInt(tmpGraph.links[i].source.index);
     }
@@ -80,37 +79,39 @@ function getNumberNodeByName(json, id) {
     for (var i = 0; i < length; i++) {
         if (json[i].name == id)
             result = i;
-    };
+    }
+    ;
     return result;
 };
 
 function getNodeByName(name) {
     var length = global.graph.nodes.length;
     for (var i = 0; i < length; i++) {
-        if (global.graph.nodes[i].name == name){
+        if (global.graph.nodes[i].name == name) {
             return global.graph.nodes[i];
         }
-    };
+    }
+    ;
     return undefined;
 };
 
 function getLinkById(id) {
     var length = global.graph.links.length;
     for (var i = 0; i < length; i++) {
-        if (global.graph.links[i].id == id){
+        if (global.graph.links[i].id == id) {
             return global.graph.links[i];
         }
-    };
+    }
+    ;
     return undefined;
 };
-
 
 
 function removeNodes(graph, namesNodes) {
 
     var namesNodesArr = namesNodes.split(',');
 
-    namesNodesArr.map(function(nameNode){
+    namesNodesArr.map(function (nameNode) {
         var numberNode = getNumberNodeByName(graph.nodes, nameNode);
         if (numberNode != -1) {
             graph.nodes.splice(numberNode, 1); //delete node from array
@@ -122,17 +123,16 @@ function removeNodes(graph, namesNodes) {
                 }
                 else i++;
             }
-            notification.create("Успешно удалено","success");
+            notification.create("Успешно удалено", "success");
         }
-        else{
-            notification.create("Ошибка","error");
+        else {
+            notification.create("Ошибка", "error");
         }
         renderGraph(graph);
     });
 
 
 };
-
 
 
 /**
@@ -144,7 +144,7 @@ function getGraphJson() {
     $.ajax({
         url: '/graph',
         method: 'get',
-        async:false,
+        async: false,
         cache: false
     }).done(function (data) {
         json = data;
@@ -159,7 +159,7 @@ function getListFile() {
     $.ajax({
         url: '/files',
         method: 'get',
-        async:false,
+        async: false,
         cache: false
     }).done(function (data) {
         listFiles = data;
@@ -174,7 +174,7 @@ function getSelectedFile() {
     $.ajax({
         url: '/file/current',
         method: 'get',
-        async:false,
+        async: false,
         cache: false
     }).done(function (data) {
         selectedFile = data;
@@ -188,7 +188,7 @@ function getSelectedFile() {
  * заполняет матрицу смежностти графа, на основе данных с d3
  */
 
-function generateAdjacencyMatrix () {
+function generateAdjacencyMatrix() {
     global.graph.graphMatrix = [];
     //инициализируем массив
     for (var i = 0; i < global.graph.nodes.length; i++) {
@@ -203,8 +203,8 @@ function generateAdjacencyMatrix () {
             //console.log(k);
             var graphMatrixIndex = global.graph.links[l].source.index;
             if (global.graph.links[l].source.index == k) {
-                var linkWeight = getWeihgtLink(global.graph.links[l].weight, global.graph.links[l].type);
-                //var linkWeight = $filter('calculateLinkWeight')(global.graph.links[l].weight, global.graph.links[l].type, global.graph.links[l].satelliteChannel);
+                var linkWeight = getWeihgtLink(global.graph.links[l].absoluteWeight, global.graph.links[l].type);
+                //var linkWeight = $filter('calculateLinkWeight')(global.graph.links[l].absoluteWeight, global.graph.links[l].type, global.graph.links[l].satelliteChannel);
                 global.graph.graphMatrix[graphMatrixIndex][global.graph.links[l].target.index] = linkWeight;
                 global.graph.graphMatrix[global.graph.links[l].target.index][graphMatrixIndex] = linkWeight;
             }
@@ -253,7 +253,7 @@ function searchShortestPathes(start, nodesCount, matrix) {
     return searchTable;
 };
 
-function getWeihgtLink(weight, ifDuplex){
+function getWeihgtLink(weight, ifDuplex) {
     var newLinkWeight = weight;
     //if (ifDuplex != 'duplex'){
     //    newLinkWeight *= 2;
@@ -263,4 +263,30 @@ function getWeihgtLink(weight, ifDuplex){
     //}
     return newLinkWeight;
 }
+
+function getNodeById(nodeId) {
+    var result = {};
+    var length = global.graph.nodes.length;
+    for (var i = 0; i < length; i++) {
+        if (global.graph.nodes[i].id == nodeId) {
+            result = global.graph.nodes[i];
+        }
+    }
+    return result;
+}
+
+function getTimeSendPackage(nodeId, packageLength, messageLength, mode) {
+    var colPackage = Math.ceil(messageLength / packageLength),
+        node = getNodeById(nodeId),
+        k = 2,
+        delay = mode == 1 ? 4 : 0,
+        shortestPathes = searchShortestPathes(node.name, global.graph.nodes.length, global.graph.graphMatrix),
+        arrTime = [];
+
+    shortestPathes.map(function (elem) {
+        arrTime.push((elem + delay) * colPackage / k );
+    });
+    return arrTime;
+};
+
 

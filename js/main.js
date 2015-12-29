@@ -103,8 +103,7 @@ function renderGraph(jsonGraph) {
     var linkText = linksWrapper
         .append('text')
         .html(function (d) {
-            var weight = d.weight;
-            return d.isDuplex == 1 ? weight*2 : weight;
+            return d.absoluteWeight;
         })
         .attr("class", "link-text");
 
@@ -120,7 +119,7 @@ function renderGraph(jsonGraph) {
             return d.name;
         })
         .attr('data-message-length', function (d) {
-            return d['message-length'];
+            return d['messageLength'];
         })
         .style("fill", function (d) {
             return color(d.group);
