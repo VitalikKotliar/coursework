@@ -9,11 +9,12 @@ function createRandomGraph() {
         colNodeInRegionNetwork = 12,
         nameNode = 0,
         idNode = 0,
-        padding = getWidthInProcent(10), //отступ от краев 10 проценво
+        width = global.width/100 * 80,
+        padding = getWidthInProcent(width,10), //отступ от краев 10 проценво
         topBorder = padding,
         bottomBorder = global.height - padding,
         leftBorder = padding,
-        rightBorder = global.svgWidth - padding,
+        rightBorder = width - padding,
     //minDistance = getWidthInProcent(5);
         minDistance = 75;
 
@@ -31,9 +32,9 @@ function createRandomGraph() {
             idNode++;
         };
         function createTwoCenterPoint() {
-            var centerX = global.svgWidth / 2,
+            var centerX = width / 2,
                 centerY = global.height / 2,
-                procentWidth = global.svgWidth / 100 * 5;
+                procentWidth = width / 100 * 5;
             addNode(centerX - procentWidth, centerY);
             addNode(centerX + procentWidth, centerY);
         };

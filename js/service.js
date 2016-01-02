@@ -18,8 +18,8 @@ function distanceBetweenPoint(x1, y1, x2, y2) {
 };
 
 
-function getWidthInProcent(procent) {
-    return global.svgWidth / 100 * procent;
+function getWidthInProcent(width,procent) {
+    return width / 100 * procent;
 };
 
 /**
@@ -40,7 +40,7 @@ function saveGraphOnSever() {
         cache: false
     }).done(function (data) {
         graph = data;
-        notification.create("Сохранено", 'info');
+        notification.create("Saved", 'info');
     }).error(function () {
         console.log("error");
     });
@@ -63,7 +63,7 @@ function clone(obj) {
 }
 
 function combineGraph(graph) {
-    //перед отправкрй нужно преобразовать json, в ребрах заменить ноуд, с  объекта этой ноды целиком на ее индекс
+    //перед отправкрй нужно преобразовать json, в linkх заменить ноуд, с  объекта этой ноды целиком на ее индекс
     //  делаем через функцию клонирования, ато задевает текущую конфигурацию графа
     var tmpGraph = clone(graph);
     for (var i = 0; i < tmpGraph.links.length; i++) {
@@ -123,10 +123,10 @@ function removeNodes(graph, namesNodes) {
                 }
                 else i++;
             }
-            notification.create("Успешно удалено", "success");
+            notification.create("Successfully removed", "success");
         }
         else {
-            notification.create("Ошибка", "error");
+            notification.create("Error", "error");
         }
         renderGraph(graph);
     });
@@ -275,16 +275,19 @@ function getNodeById(nodeId) {
     return result;
 }
 
-function getTimeSendPackage(nodeId, packageLength, messageLength, mode) {
+function getArrTimeSendPackage(nodeId, packageLength, messageLength, mode) {
     var colPackage = Math.ceil(messageLength / packageLength),
         node = getNodeById(nodeId),
         k = 2,
-        delay = mode == 1 ? 4 : 0,
+        delay = (mode == "logic") ? 4 : 0,
         shortestPathes = searchShortestPathes(node.name, global.graph.nodes.length, global.graph.graphMatrix),
         arrTime = [];
 
     shortestPathes.map(function (elem) {
-        arrTime.push((elem + delay) * colPackage / k );
+        if (elem != 0) // без этого добавляет время с вершины в вершину
+            arrTime.push((elem + delay) * colPackage / k);
+        else
+            arrTime.push(0);
     });
     return arrTime;
 };

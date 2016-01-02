@@ -7,6 +7,11 @@
 addEventListener("DOMContentLoaded", function () {
 
 
+    $(window).resize(function () {
+        initWindow();
+        renderGraph();
+    });
+
     var $body = $('body');
 
     $body.on("submit", '.js-simple-form', function (e) {
@@ -23,11 +28,10 @@ addEventListener("DOMContentLoaded", function () {
             cache: false
         }).done(function (data) {
             $('.modal').modal('hide');
-            console.log(data);
             renderGraph(data);
         }).error(function () {
             console.log("error");
-            notification.create("Ошибка", "error");
+            notification.create("Error", "error");
         });
     });
 
@@ -115,7 +119,7 @@ addEventListener("DOMContentLoaded", function () {
 
         $modalTable.empty().append(global.templates["js-template-table"]({
             data: shortestPathes,
-            title: 'Таблица маршрутизации для узла № ' + valInput
+            title: 'Table маршрутизации для node № ' + valInput
         }));
         $modalTable.modal('toggle');
     });
@@ -124,6 +128,25 @@ addEventListener("DOMContentLoaded", function () {
     /**
      * MENU UI
      */
+
+    $('.js-toggle-menu').on('click', function (e) {
+        var $this = $(this);
+        var $menu = $this.closest('.wr-menu');
+        var $inner = $this.closest('.wr-menu').find('.wr-inner');
+
+        if ($menu.hasClass('on')) {
+
+            $menu.animate({width: '30'}, 100);
+            $inner.animate({opacity: '0'}, 100);
+            $menu.removeClass('on');
+
+        }
+        else {
+            $menu.animate({width: '20%'}, 100);
+            $inner.animate({opacity: '1'}, 100);
+            $menu.addClass('on');
+        }
+    });
 
     $('.js-section-title').on('click', function () {
         var $this = $(this);
@@ -155,9 +178,9 @@ addEventListener("DOMContentLoaded", function () {
             $modalNodeParam = $('.js-modal-node-parameters'),
             messageLength = $(this).data('messageLength') || inputData.defaultMessageLength;
         $modalNodeParam.empty().append(global.templates["js-modal-node-parameters"]({
-            idNode:idNode,
-            nodeName:nodeName,
-            messageLength:messageLength
+            idNode: idNode,
+            nodeName: nodeName,
+            messageLength: messageLength
         }));
         $modalNodeParam.modal('toggle');
     });
@@ -183,7 +206,7 @@ addEventListener("DOMContentLoaded", function () {
     });
 
     /**
-     * handlers for nodes parametrs in modal window
+     * handlers for nodes parameters in modal window
      */
 
     $body.on('click', '.js-table-shortest-way', function () {
@@ -195,13 +218,13 @@ addEventListener("DOMContentLoaded", function () {
 
         $(this).closest('.modal').modal('hide');
 
-        setTimeout(function(){ //задержка для того что прошлый попап успел скрыться
+        setTimeout(function () { //задержка для того что прошлый попап успел скрыться
             $modalTable.empty().append(global.templates["js-template-table"]({
                 data: shortestPathes,
-                title: 'Таблица маршрутизации для узла № ' + valInput
+                title: 'Table маршрутизации для node № ' + valInput
             }));
             $modalTable.modal('toggle');
-        },800);
+        }, 800);
     });
 
     $body.on('click', '.js-table-time', function () {
@@ -212,37 +235,38 @@ addEventListener("DOMContentLoaded", function () {
             $modalTable = $('.js-modal-table-time');
 
         $(this).closest('.modal').modal('hide');
+
         var node = getNodeById(nodeId);
 
+        var arrDatagram1050 = getArrTimeSendPackage(nodeId, 1050, messageLength, "datagrams"),
+            arrDatagram2050 = getArrTimeSendPackage(nodeId, 2050, messageLength, "datagrams"),
+            arrDatagram3050 = getArrTimeSendPackage(nodeId, 3050, messageLength, "datagrams"),
+            arrLogic1050 = getArrTimeSendPackage(nodeId, 1050, messageLength, "logic"),
+            arrLogic2050 = getArrTimeSendPackage(nodeId, 2050, messageLength, "logic"),
+            arrLogic3050 = getArrTimeSendPackage(nodeId, 3050, messageLength, "logic"),
+            length = arrDatagram1050.length;
 
-        var arrDetagram1050 = getTimeSendPackage(nodeId, 1050, messageLength, 0); //datagrams
-        var arrDetagram2050 =  getTimeSendPackage(nodeId, 2050, messageLength, 0); //datagrams
-        var arrDetagram3050 = getTimeSendPackage(nodeId, 3050, messageLength, 0); //datagrams
-        var arrLogic1050 = getTimeSendPackage(nodeId, 1050, messageLength, 0); //logic
-        var arrLogic2050 =  getTimeSendPackage(nodeId, 2050, messageLength, 0); //logic
-        var arrLogic3050 = getTimeSendPackage(nodeId, 3050, messageLength, 0); //logic
-
-        var length = arrDetagram1050.length;
         var tmpObj = {};
+
         for (var i = 0; i < length; i++) {
             tmpObj[i] = {};
             var tmp = tmpObj[i];
             tmp.nodeName = i;
-            tmp.arrDetagram1050 = arrDetagram1050[i];
-            tmp.arrDetagram2050 = arrDetagram2050[i];
-            tmp.arrDetagram3050 = arrDetagram3050[i];
+            tmp.arrDatagram1050 = arrDatagram1050[i];
+            tmp.arrDatagram2050 = arrDatagram2050[i];
+            tmp.arrDatagram3050 = arrDatagram3050[i];
             tmp.arrLogic1050 = arrLogic1050[i];
             tmp.arrLogic2050 = arrLogic2050[i];
             tmp.arrLogic3050 = arrLogic3050[i];
         }
 
-        setTimeout(function(){ //задержка для того что прошлый попап успел скрыться
+        setTimeout(function () { //задержка для того что прошлый попап успел скрыться
             $modalTable.empty().append(global.templates["js-modal-table-time"]({
                 data: tmpObj,
                 nodeName: nodeName,
-                messageLength:messageLength
+                messageLength: messageLength
             }));
             $modalTable.modal('toggle');
-        },800);
+        }, 800);
     });
 });

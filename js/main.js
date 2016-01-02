@@ -51,17 +51,17 @@ var global = {
 
 
 function initWindow() {
-    global.height = window.innerHeight;
-    global.width = window.innerWidth;
-    global.svgWidth = window.innerWidth / 100 * 80;
+    global.height = $(window).height();
+    global.width = $(window).width();
+    //global.svgWidth = window.innerWidth / 100 * 80;
 
     global.force = d3.layout.force()
         //.charge(-120)
         //.linkDistance(30)
-        .size([global.svgWidth, global.height]);
+        .size([global.width, global.height]);
 
     global.svg = d3.select("svg")
-        .attr("width", global.svgWidth)
+        .attr("width", global.width)
         .attr("height", global.height);
 };
 

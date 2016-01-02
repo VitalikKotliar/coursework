@@ -56,3 +56,13 @@ global.checkDistance = function(nodes,x1, y1) {
     });
     return flag;
 }
+
+global.getLinkById = function(json,id) {
+    var length = json.length;
+    for (var i = 0; i < length; i++) {
+        if (json[i].id == id) {
+            return json[i];
+        }
+    }
+    return undefined;
+};

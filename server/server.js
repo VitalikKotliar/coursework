@@ -4,13 +4,14 @@ var myFunctions = require('./service'),
     path = require('path'),
     port = 5656,
     fs = require('fs'),
-    rootProject = "/home/vitalik/Projects/course_work_my/", //TODO найти лучшее решение
+    rootProject = global.appRoot, //TODO найти лучшее решение
     pathFilesData = path.join(rootProject + '/server/data/'),
     nameCurrentFile = 'graph.json',
     pathJsonFile = path.join(pathFilesData + nameCurrentFile),
     jsonfile = require('jsonfile'), // for usability read and write file
     bodyParser = require('body-parser'),
-    dirPath = rootProject + 'server/data';
+    dirPath = rootProject + '/server/data';
+
 global.fileNameData = [];
 
 app.use(bodyParser.json());       // to support JSON-encoded bodies
@@ -118,46 +119,6 @@ app.post('/add/node', function (req, res) {
 });
 
 /**
- * REMOVE NODE
- */
-
-
-//app.post('/remove/node', function (req, res) {
-//
-//    console.log("post request remove node");
-//
-//    var idNode = req.body.idNode;
-//
-//    jsonfile.readFile(pathJsonFile, function (err, obj) {
-//        if (err) res.statusCode = 404;
-//        var json = obj;
-//
-//        var numberNode = global.getNumberNodeById(json.nodes, idNode);
-//
-//        if (numberNode != -1) {
-//            json.nodes.splice(numberNode, 1); //delete node from array
-//            // remove all link with this node
-//            for (var i = 0; i < json.links.length; i++) {
-//                if (json.links[i]['source'] == numberNode || json.links[i]['target'] == numberNode) {
-//                    json.links.splice(i, 1);
-//                    i--;
-//                }
-//                else i++;
-//            }
-//        }
-//        jsonfile.writeFile(pathJsonFile, json, function (err) {
-//            if (err) res.statusCode = 404;
-//            //возвращаем на клиет весь джсон
-//            jsonfile.readFile(pathJsonFile, function (err, obj) {
-//                res.statusCode = 200;
-//                res.send(obj);
-//            });
-//        });
-//    });
-//});
-
-
-/**
  * ADD LINK
  */
 
@@ -167,20 +128,25 @@ app.post('/add/link', function (req, res) {
 
     jsonfile.readFile(pathJsonFile, function (err, obj) {
         if (err) res.statusCode = 404;
-        var json = obj;
-        var source = global.getNumberNodeByName(json.nodes, req.body.source);
-        var target = global.getNumberNodeByName(json.nodes, req.body.target);
-        console.log(source);
-        console.log(target);
-        if (source && target) {
-            json.links.push(
-                {
-                    "source": source,
-                    "target": target,
-                    "value": 5,
-                    "weights": req.body.weights
-                }
-            );
+        var json = obj,
+            source = global.getNumberNodeByName(json.nodes, req.body.source),
+            target = global.getNumberNodeByName(json.nodes, req.body.target),
+            linkId = source + '-' + target;
+
+        if (source && target && req.body.type
+            && source != target
+            && !global.getLinkById(json.links, linkId)) {
+            var tmp = {
+                "source": source,
+                "target": target,
+                "value": 5,
+                "weight": parseInt(req.body.weight),
+                "isDuplex": req.body.type,
+                "id": linkId
+            }
+            tmp.absoluteWeight = (tmp.isDuplex == 1) ? tmp.weight * 2 : tmp.weight;
+            console.log(tmp.absoluteWeight);
+            json.links.push(tmp);
             jsonfile.writeFile(pathJsonFile, json, function (err) {
                 if (err) res.statusCode = 404;
                 //возвращаем на клиет весь джсон
@@ -276,7 +242,8 @@ app.post('/link/parameters', function (req, res) {
                 if (obj.links[i].id == idLink) {
                     link = obj.links[i];
                 }
-            };
+            }
+            ;
 
             link.isDuplex = req.body["type"];
             jsonfile.writeFile(pathJsonFile, obj, function (err) {
@@ -309,7 +276,8 @@ app.post('/node/parameters', function (req, res) {
                 if (obj.nodes[i].id == nodeId) {
                     node = obj.nodes[i];
                 }
-            };
+            }
+            ;
 
             node['messageLength'] = req.body["messageLength"];
 

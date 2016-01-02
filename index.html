@@ -40,7 +40,7 @@
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger cancel">Закрыть</button>
+                <button type="button" class="btn btn-danger cancel">Close</button>
             </div>
         </div>
     </div>
@@ -53,22 +53,23 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Параметры узла № {{nodeName}}</h4>
+                <h4 class="modal-title">Options node № {{nodeName}}</h4>
             </div>
             <form action="/node/parameters" method="post" class="js-simple-form">
                 <div class="modal-body">
                     <input type="hidden" name="id-node" value="{{idNode}}">
                     <input type="hidden" name="name-node" value="{{nodeName}}">
                     <div class="form-group">
-                        <label for="message-length">Длина сообщения:</label>
-                        <input type="text" class="form-control" name="messageLength" value="{{messageLength}}" id="message-length">
+                        <label for="message-length">Length message:</label>
+                        <input type="text" class="form-control" name="messageLength" value="{{messageLength}}"
+                               id="message-length">
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-info js-table-time">Таблица времени</button>
-                    <button type="button" class="btn btn-info js-table-shortest-way">Таблица маршрутизации</button>
-                    <button type="submit" class="btn btn-success">Сохранить</button>
-                    <button type="button" class="btn btn-danger cancel">Закрыть</button>
+                    <button type="button" class="btn btn-primary js-table-time">Table time</button>
+                    <button type="button" class="btn btn-info js-table-shortest-way">Table of routing</button>
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-danger cancel">Close</button>
                 </div>
             </form>
         </div>
@@ -82,7 +83,7 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Параметры ребра {{linkName}}</h4>
+                <h4 class="modal-title">Options link № {{linkName}}</h4>
             </div>
             <form action="/link/parameters" method="post" class="js-simple-form">
                 <div class="modal-body">
@@ -90,19 +91,19 @@
                     <div class="radio">
                         <label>
                             <input type="radio" name="type" value="1" {{#if isDuplex}}checked{{/if}}>
-                            Дуплекс
+                            Duplex
                         </label>
                     </div>
                     <div class="radio">
                         <label>
                             <input type="radio" name="type" value="0" {{#if isHalfDuplex}}checked{{/if}}>
-                            Полудуплекс
+                            Half-duplex
                         </label>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="submit" class="btn btn-success">Сохранить</button>
-                    <button type="button" class="btn btn-danger cancel">Закрыть</button>
+                    <button type="submit" class="btn btn-success">Save</button>
+                    <button type="button" class="btn btn-danger cancel">Close</button>
                 </div>
             </form>
         </div>
@@ -115,20 +116,20 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Таблица времени для узла № {{nodeName}}</h4>
+                <h4 class="modal-title">Table time for node № {{nodeName}}</h4>
             </div>
             <div class="modal-body">
-                Длина сообщения: {{messageLength}}
+                Length message: {{messageLength}}
                 <table class="table table-striped table-bordered table-hover">
                     <thead>
                     <tr>
-                        <td>№ узла</td>
-                        <td>Логи -чный (1050)</td>
-                        <td>Логи -чный (2050)</td>
-                        <td>Логи -чный (3050)</td>
-                        <td>Дейта -грамный (1050)</td>
-                        <td>Дейта -грамный (2050)</td>
-                        <td>Дейта -грамный (3050)</td>
+                        <td>№ node</td>
+                        <td>Logic (1050)</td>
+                        <td>Logic (2050)</td>
+                        <td>Logic (3050)</td>
+                        <td>Data -gram (1050)</td>
+                        <td>Data -gram (2050)</td>
+                        <td>Data -gram (3050)</td>
                     </tr>
                     </thead>
                     {{#each data}}
@@ -137,128 +138,125 @@
                         <td>{{arrLogic1050}}</td>
                         <td>{{arrLogic2050}}</td>
                         <td>{{arrLogic3050}}</td>
-                        <td>{{arrDetagram1050}}</td>
-                        <td>{{arrDetagram2050}}</td>
-                        <td>{{arrDetagram3050}}</td>
+                        <td>{{arrDatagram1050}}</td>
+                        <td>{{arrDatagram2050}}</td>
+                        <td>{{arrDatagram3050}}</td>
                     </tr>
                     {{/each}}
                 </table>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger cancel">Закрыть</button>
+                <button type="button" class="btn btn-danger cancel">Close</button>
             </div>
         </div>
     </div>
 </script>
 
-<div class="wr-menu">
-    <div class="js-section section">
-        <div class="js-section-title section-title">Дополнительно<i class="fa"></i></div>
-        <div class="js-section-content section-content addition">
-            <div class="item-menu ">
-                <button class="js-undo btn btn-info">Назад</button>
-                <button class="js-redo btn btn-primary">Впред</button>
-            </div>
-            <div class="item-menu">
-                <button class="js-save save btn btn-success">Сохранить</button>
-            </div>
-            <!--<div class="item-menu">-->
-            <!--<button class="js-all-nodes-left">Подвинуть влево</button>-->
-            <!--</div>-->
-        </div>
-    </div>
-    <div class="js-section section">
-        <div class="js-section-title section-title">Работа с вершинами <i class="fa"></i></div>
-        <div class="js-section-content section-content">
-            <div class="item-menu">
-                <form method="post" action="add/node" class="js-simple-form">
-                    Добавление вершины
-                    <br>
-                    <button type="submit" class="btn btn-success">Добавить</button>
-                </form>
-            </div>
-            <div class="item-menu">
-                <form>
-                    Удаление вершины
-                    <br>
-                    Введите номер:
-                    <input type="text" name="idNode" class="form-control">
-                    <button class="js-remove-node btn btn-danger">Удалить</button>
-                </form>
-            </div>
-        </div>
-    </div>
-    <div class="js-section section">
-        <div class="js-section-title section-title">Работа с ребрами <i class="fa"></i></div>
-        <div class="js-section-content section-content">
-            <div class="item-menu">
-                <form method="post" class="add-link js-simple-form" action="add/link">
-                    Добавление ребра
-                    <br>
-                    Источник:
-                    <input type="text" name="source" class="form-control">
-                    Приемник:
-                    <input type="text" name="target" class="form-control">
-                    <div class="form-group">
-                        Вес
-                        <select name="weight" class="js-link-weight form-control" id="link-weight"></select>
-                    </div>
-                    <button type="submit" class="btn btn-success">Добавить</button>
-                </form>
-            </div>
 
-            <div class="item-menu">
-                <form method="post" class="remove-link js-simple-form" action="remove/link">
-                    Удаление ребра
-                    <br>
-                    Источник:
-                    <input type="text" name="source" class="form-control">
-                    Приемник:
-                    <input type="text" name="target" class="form-control">
-                    <button type="submit" class="btn btn-danger">Удалить</button>
-                </form>
+<div class="wr-menu on">
+    <i class="fa fa-arrow-circle-o-right js-toggle-menu toggle-menu"></i>
+
+    <div class="wr-inner">
+
+        <div class="js-section section">
+            <div class="js-section-title section-title">Additionally<i class="fa"></i></div>
+            <div class="js-section-content section-content addition">
+                <div class="item-menu ">
+                    <button class="js-undo btn btn-info">Undo</button>
+                    <button class="js-redo btn btn-primary">Redo</button>
+                </div>
+                <div class="item-menu">
+                    <button class="js-save save btn btn-success">Save</button>
+                </div>
+                <!--<div class="item-menu">-->
+                <!--<button class="js-all-nodes-left">Подвинуть влево</button>-->
+                <!--</div>-->
             </div>
         </div>
-    </div>
-    <div class="js-section section">
-        <div class="js-section-title section-title">Выбор графа<i class="fa"></i></div>
-        <div class="js-section-content section-content">
-            <div class="item-menu">
-                <div class="form-group">
-                    Выберете файл
-                    <select name="file-graph" class="js-file-graph form-control"></select>
+        <div class="js-section section">
+            <div class="js-section-title section-title">Work with nodes <i class="fa"></i></div>
+            <div class="js-section-content section-content">
+                <div class="item-menu">
+                    <form method="post" action="add/node" class="js-simple-form">
+                        Add node
+                        <br>
+                        <button type="submit" class="btn btn-success">Add</button>
+                    </form>
+                </div>
+                <div class="item-menu">
+                    <form>
+                        Remove node
+                        <br>
+                        Input numbers:
+                        <input type="text" name="idNode" class="form-control">
+                        <button class="js-remove-node btn btn-danger">Remove</button>
+                    </form>
                 </div>
             </div>
-            <div class="item-menu">
-                <button class="js-random-graph btn btn-info">Случаный граф</button>
-            </div>
         </div>
-    </div>
-    <div class="js-section section">
-        <div class="js-section-title section-title">Маршрутицазия<i class="fa"></i></div>
-        <div class="js-section-content section-content">
-            <div class="item-menu js-wr">
-                Введите номер вершины:
-                <input type="text" name="name-node" value="0" class="form-control">
-                <button class="js-shortest-way btn btn-success">Кратчайший путь</button>
-            </div>
-        </div>
-    </div>
-    <!--<div class="js-section section">-->
-    <!--<div class="js-section-title section-title">Попытка<i class="fa"></i></div>-->
-    <!--<div class="js-section-content section-content">-->
-    <!--<div class="item-menu js-wr">-->
-    <!--<button id="lolka" data-toggle="popover" title="Popover title"-->
-    <!--data-content="And here's some amazing content. It's very engaging. Right?">Проба-->
-    <!--</button>-->
-    <!--<button type="button" class="btn btn-lg btn-danger" data-toggle="popover" title="Popover title"-->
-    <!--data-content="And here's some amazing content. It's very engaging. Right?">Click to toggle-->
-    <!--popover-->
-    <!--</button>-->
-    <!--</div>-->
-    <!--</div>-->
-    <!--</div>-->
+        <div class="js-section section">
+            <div class="js-section-title section-title">Work with links <i class="fa"></i></div>
+            <div class="js-section-content section-content">
+                <div class="item-menu">
+                    <form method="post" class="add-link js-simple-form" action="add/link">
+                        Add link
+                        <br>
+                        Source:
+                        <input type="text" name="source" class="form-control">
+                        Target:
+                        <input type="text" name="target" class="form-control">
+                        <div class="form-group">
+                            Weight
+                            <select name="weight" class="js-link-weight form-control" id="link-weight"></select>
+                        </div>
+                        <div class="form-group">
+                            Type channel:
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="type" value="1" checked>
+                                    Duplex
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="type" value="0">
+                                    Half-duplex
+                                </label>
+                            </div>
+                        </div>
+                        <button type="submit" class="btn btn-success">Add</button>
+                    </form>
+                </div>
 
+                <div class="item-menu">
+                    <form method="post" class="remove-link js-simple-form" action="remove/link">
+                        Remove link
+                        <br>
+                        Source:
+                        <input type="text" name="source" class="form-control">
+                        Target:
+                        <input type="text" name="target" class="form-control">
+                        <button type="submit" class="btn btn-danger">Remove</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="js-section section">
+            <div class="js-section-title section-title">Choosing graph<i class="fa"></i></div>
+            <div class="js-section-content section-content">
+                <div class="item-menu">
+                    <div class="form-group">
+                        Choose file
+                        <select name="file-graph" class="js-file-graph file-graph form-control"></select>
+                    </div>
+                </div>
+                <div class="item-menu">
+                    <button class="js-random-graph btn btn-info">Random graph</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
 </div>
 
 <div class="modal-random-graph modal fade" tabindex="-1" role="dialog">
@@ -267,15 +265,15 @@
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
                         aria-hidden="true">&times;</span></button>
-                <h4 class="modal-title">Подтверждение</h4>
+                <h4 class="modal-title">Confirmation</h4>
             </div>
             <div class="modal-body">
-                <p>Граф в текущем файле будет утерят. Продолжить?</p>
+                <p>The graph in the current file will be lost. Continue?</p>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-success js-random-graph-confirmation" data-dismiss="modal">Да
+                <button type="button" class="btn btn-success js-random-graph-confirmation" data-dismiss="modal">Yes
                 </button>
-                <button type="button" class="btn btn-danger cancel">Закрыть</button>
+                <button type="button" class="btn btn-danger cancel">Close</button>
 
             </div>
         </div>
