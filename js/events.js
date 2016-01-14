@@ -218,9 +218,20 @@ addEventListener("DOMContentLoaded", function () {
 
         $(this).closest('.modal').modal('hide');
 
+        var arr = [];
+
+        shortestPathes.routesArray.forEach(function (elem, index) {
+            arr[index] = {
+                index : index,
+                shortestPath : shortestPathes.searchTable[index],
+                path : shortestPathes.routesArray[index]['route'].join(' -> ')
+
+            }
+        });
+
         setTimeout(function () { //задержка для того что прошлый попап успел скрыться
             $modalTable.empty().append(global.templates["js-template-table"]({
-                data: shortestPathes,
+                data: arr,
                 title: 'Table маршрутизации для node № ' + valInput
             }));
             $modalTable.modal('toggle');
@@ -238,28 +249,30 @@ addEventListener("DOMContentLoaded", function () {
 
         var node = getNodeById(nodeId);
 
-        var arrDatagram1050 = getArrTimeSendPackage(nodeId, 1050, messageLength, "datagrams"),
-            arrDatagram2050 = getArrTimeSendPackage(nodeId, 2050, messageLength, "datagrams"),
-            arrDatagram3050 = getArrTimeSendPackage(nodeId, 3050, messageLength, "datagrams"),
-            arrLogic1050 = getArrTimeSendPackage(nodeId, 1050, messageLength, "logic"),
-            arrLogic2050 = getArrTimeSendPackage(nodeId, 2050, messageLength, "logic"),
-            arrLogic3050 = getArrTimeSendPackage(nodeId, 3050, messageLength, "logic"),
-            length = arrDatagram1050.length;
+
+        var matrixForTableTime = [];
+        var packagesSize = [1050, 2050, 3050];
+
+        packagesSize.forEach(function (packageLength, i) {
+            matrixForTableTime[i] = getTimesAndColsPackege(nodeId, packageLength, messageLength, "logic");
+            matrixForTableTime[i + 3] = getTimesAndColsPackege(nodeId, packageLength, messageLength, "datagrams");
+        });
+
 
         var tmpObj = {};
-
-        for (var i = 0; i < length; i++) {
-            tmpObj[i] = {};
-            var tmp = tmpObj[i];
-            tmp.nodeName = i;
-            tmp.arrDatagram1050 = arrDatagram1050[i];
-            tmp.arrDatagram2050 = arrDatagram2050[i];
-            tmp.arrDatagram3050 = arrDatagram3050[i];
-            tmp.arrLogic1050 = arrLogic1050[i];
-            tmp.arrLogic2050 = arrLogic2050[i];
-            tmp.arrLogic3050 = arrLogic3050[i];
-        }
-
+        var weightPaths = searchShortestPathes(node.name, global.graph.nodes.length, global.graph.graphMatrix).searchTable;
+        //переганяем в удобный вид для шаблонизатора.
+        matrixForTableTime[0].forEach(function (elem,index) {
+            tmpObj[index] = {};
+            var tmp = tmpObj[index];
+            tmp.nodeName = index;
+            tmp.weightPath = weightPaths[index];
+            tmp.paths = matrixForTableTime[0][index].paths;
+            for (var j = 0; j < packagesSize.length; j++) {
+                tmp["arrLogic" + packagesSize[j]] = matrixForTableTime[j][index];
+                tmp["arrDatagram" + packagesSize[j]] = matrixForTableTime[j + 3][index];
+            }
+        });
         setTimeout(function () { //задержка для того что прошлый попап успел скрыться
             $modalTable.empty().append(global.templates["js-modal-table-time"]({
                 data: tmpObj,
@@ -269,4 +282,5 @@ addEventListener("DOMContentLoaded", function () {
             $modalTable.modal('toggle');
         }, 800);
     });
-});
+})
+;

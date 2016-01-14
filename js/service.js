@@ -18,7 +18,7 @@ function distanceBetweenPoint(x1, y1, x2, y2) {
 };
 
 
-function getWidthInProcent(width,procent) {
+function getWidthInProcent(width, procent) {
     return width / 100 * procent;
 };
 
@@ -219,38 +219,72 @@ function generateAdjacencyMatrix() {
  *
  */
 function searchShortestPathes(start, nodesCount, matrix) {
-    //готовим массив к поиску TODO нужно ли это?
-    //    var array = this.dataSet.nodes;
-    //    var newVertex = array.splice(start,1);
-    //    array.unshift(newVertex[0]);
     var array = global.graph.nodes;
 
     var searchTable = [];
     // тут храним текущею и предидущую вершиныЮ для исключения их с проверки
     var vertexArray = [];
+
+    //тут собитраем предков что бы восстановить путь
+    var parentsArray = [];
+    //финальный массив в котором будут пути для каждо из точек
+    var routesArray = [];
     // сначала инициализируем таблицу поиска (всем кроме стартовой вершины - infinity)
     for (var k = 0; k < nodesCount; k++) {
-        searchTable[k] = Infinity
+        searchTable[k] = Infinity;
+        parentsArray[k] = [];
     }
     // вершину начала поиска обнуляем
     searchTable[start] = 0;
     vertexArray.push(start);
-
     // n-1 итераций согласно алгоритму
     for (var m = 0; m < array.length - 1; m++) {
         for (var i = 0; i < array.length; i++) {
             vertexArray.push(array[i].index);
             var prevVertex = vertexArray[0];
             var tempVertex = vertexArray[vertexArray.length - 1];
+            //console.log("prev vertex" + vertexArray[0]);
+            //console.log("temp vertex" + tempVertex);
             for (var j = 0; j < array.length; j++) {
                 if (matrix[tempVertex][j] > 0 && matrix[tempVertex][j] + searchTable[tempVertex] < searchTable[j]) {
                     searchTable[j] = matrix[tempVertex][j] + searchTable[tempVertex];
+                    parentsArray[j] = tempVertex;
                 }
             }
+            //console.log(searchTable);
+            //console.log("===================");
             vertexArray.shift();
         }
     }
-    return searchTable;
+    ;
+
+    //Теперь соберем новый массив, на основе parentsArray, в который запишем сколько узлов нужно
+    //прости сообщению с исходной точки до остальных и восстановим путь
+    for (var n = 0; n < array.length; n++) {
+        if (n != start) {
+            routesArray[n] = ({
+                'route': [],
+                'nodesCount': null
+            });
+            var prevNode = parentsArray[n];
+            routesArray[n].route.push(n);
+            while (prevNode != start) {
+                routesArray[n].route.push(prevNode);
+                prevNode = parentsArray[prevNode]
+            }
+            //Заканчиваем путь искходой вершиной
+            routesArray[n].route.push(parseInt(start));
+            //Переворачиваем массив, так как восстанавливали путь с финишной точки пути
+            routesArray[n].route.reverse();
+            //Добавляем колличество узлов в маршруте
+            routesArray[n].nodesCount = routesArray[n].route.length;
+        }
+    }
+
+    return {
+        'searchTable': searchTable,
+        'routesArray': routesArray
+    };
 };
 
 function getWeihgtLink(weight, ifDuplex) {
@@ -275,21 +309,59 @@ function getNodeById(nodeId) {
     return result;
 }
 
-function getArrTimeSendPackage(nodeId, packageLength, messageLength, mode) {
-    var colPackage = Math.ceil(messageLength / packageLength),
-        node = getNodeById(nodeId),
-        k = 2,
-        delay = (mode == "logic") ? 4 : 0,
-        shortestPathes = searchShortestPathes(node.name, global.graph.nodes.length, global.graph.graphMatrix),
-        arrTime = [];
+function getTimesAndColsPackege(nodeId, packageLength, messageLength, mode) {
+    var colSending = Math.ceil(messageLength / (packageLength - 50)); //50 - size header
+    var node = getNodeById(nodeId);
+    var k = 100;
+    var shortestPathResult = searchShortestPathes(node.name, global.graph.nodes.length, global.graph.graphMatrix);
+    var shortestPaths = shortestPathResult.searchTable;
+    var arrTimeAndColsPackage = [];
+    var colPackageService = 0;
+    var colPackageInfo = 0;
+    shortestPathResult.routesArray.map(function (elem,index) {
+        var colNodes = elem.nodesCount;
+        var shortestPath = shortestPathResult.searchTable[index];
+        if (shortestPath != 0) // без этого добавляет время с вершины в вершину
+        {
+            if (mode == "logic") {
+                if (colNodes == 2){
+                    colPackageService = 6;
+                }
+                else{
+                    if (colNodes > 2){
+                        colPackageService = colSending*(2*6 + (colNodes - 3)*3);
+                    }
+                    else{
+                        console.log("error");
+                    }
+                }
+            }
+            else{
+                if (mode == "datagrams") {
+                    colPackageService = colSending*(colNodes - 1)*2;
+                }
+                else{
+                    console.log("error");
+                }
+            }
 
-    shortestPathes.map(function (elem) {
-        if (elem != 0) // без этого добавляет время с вершины в вершину
-            arrTime.push((elem + delay) * colPackage / k);
+            colPackageInfo = colSending;
+
+
+
+            arrTimeAndColsPackage[index] = {
+                time: shortestPath*(colPackageInfo + colPackageService) / k,
+                colPackage: {info: colPackageInfo, service: colPackageService},
+                paths: elem.route.join(' -> ')
+            };
+        }
         else
-            arrTime.push(0);
+            arrTimeAndColsPackage[index] = {
+                time: 0,
+                colPackage: {info: 0, service: 0}
+            };
     });
-    return arrTime;
+    return arrTimeAndColsPackage;
 };
 
 

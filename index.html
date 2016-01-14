@@ -33,8 +33,9 @@
                 <table class="table table-striped table-bordered table-hover">
                     {{#each data}}
                     <tr>
-                        <td>{{@index}}</td>
-                        <td>{{this}}</td>
+                        <td>{{index}}</td>
+                        <td>{{shortestPath}}</td>
+                        <td>{{path}}</td>
                     </tr>
                     {{/each}}
                 </table>
@@ -120,27 +121,30 @@
             </div>
             <div class="modal-body">
                 Length message: {{messageLength}}
-                <table class="table table-striped table-bordered table-hover">
+                <table class="table table-striped table-bordered table-hover little-p-fz">
                     <thead>
                     <tr>
-                        <td>№ node</td>
-                        <td>Logic (1050)</td>
-                        <td>Logic (2050)</td>
-                        <td>Logic (3050)</td>
-                        <td>Data -gram (1050)</td>
-                        <td>Data -gram (2050)</td>
-                        <td>Data -gram (3050)</td>
+                        <td>№</td>
+                        <td>Path</td>
+                        <td>Logic(1050)</td>
+                        <td>Logic(2050)</td>
+                        <td>Logic(3050)</td>
+                        <td>Datagram (1050)</td>
+                        <td>Datagram (2050)</td>
+                        <td>Datagram (3050)</td>
                     </tr>
                     </thead>
                     {{#each data}}
                     <tr>
                         <td>{{nodeName}}</td>
-                        <td>{{arrLogic1050}}</td>
-                        <td>{{arrLogic2050}}</td>
-                        <td>{{arrLogic3050}}</td>
-                        <td>{{arrDatagram1050}}</td>
-                        <td>{{arrDatagram2050}}</td>
-                        <td>{{arrDatagram3050}}</td>
+                        <td>{{weightPath}}({{paths}})</td>
+                        <td>{{arrLogic1050.time}}(i: {{arrLogic1050.colPackage.info}}, s: {{arrLogic1050.colPackage.service}})</td>
+                        <td>{{arrLogic2050.time}}(i: {{arrLogic2050.colPackage.info}}, s: {{arrLogic2050.colPackage.service}})</td>
+                        <td>{{arrLogic3050.time}}(i: {{arrLogic3050.colPackage.info}}, s: {{arrLogic3050.colPackage.service}})</td>
+                        <td>{{arrDatagram1050.time}}(i: {{arrDatagram1050.colPackage.info}}, s: {{arrDatagram1050.colPackage.service}})</td>
+                        <td>{{arrDatagram2050.time}}(i: {{arrDatagram2050.colPackage.info}}, s: {{arrDatagram2050.colPackage.service}})</td>
+                        <td>{{arrDatagram3050.time}}(i: {{arrDatagram3050.colPackage.info}}, s: {{arrDatagram3050.colPackage.service}})</td>
+
                     </tr>
                     {{/each}}
                 </table>
