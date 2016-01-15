@@ -338,14 +338,14 @@ function getTimesAndColsPackege(nodeId, packageLength, messageLength, mode) {
             }
             else{
                 if (mode == "datagrams") {
-                    colPackageService = colSending*(colNodes - 1)*2;
+                    colPackageService = colSending*(colNodes - 1)*3;
                 }
                 else{
                     console.log("error");
                 }
             }
 
-            colPackageInfo = colSending;
+            colPackageInfo = colSending*(colNodes - 1);
 
 
 

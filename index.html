@@ -18,7 +18,8 @@
 
 <script class="js-templates" id="js-template-select" type="text/x-handlebars-template">
     {{#each data}}
-    <option value="{{this}}">{{this}}</option>{{/each}}
+    <option value="{{this}}">{{this}}</option>
+    {{/each}}
 </script>
 
 <script class="js-templates" id="js-template-table" type="text/x-handlebars-template">
@@ -88,6 +89,8 @@
             </div>
             <form action="/link/parameters" method="post" class="js-simple-form">
                 <div class="modal-body">
+                    Type channel:
+                    <br>
                     <input type="hidden" name="id-link" value="{{idLink}}">
                     <div class="radio">
                         <label>
@@ -101,6 +104,13 @@
                             Half-duplex
                         </label>
                     </div>
+                    Weight channel:
+                    <br>
+                    <select name="weightLink" class="form-control" id="">
+                        {{#each selectData}}
+                        <option value="{{this.value}}" {{this.selected}}>{{this.value}}</option>
+                        {{/each}}
+                    </select>
                 </div>
                 <div class="modal-footer">
                     <button type="submit" class="btn btn-success">Save</button>
@@ -112,7 +122,7 @@
 </script>
 
 <script class="js-templates" id="js-modal-table-time" type="text/x-handlebars-template">
-    <div class="modal-dialog">
+    <div class="modal-dialog large">
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
@@ -138,12 +148,24 @@
                     <tr>
                         <td>{{nodeName}}</td>
                         <td>{{weightPath}}({{paths}})</td>
-                        <td>{{arrLogic1050.time}}(i: {{arrLogic1050.colPackage.info}}, s: {{arrLogic1050.colPackage.service}})</td>
-                        <td>{{arrLogic2050.time}}(i: {{arrLogic2050.colPackage.info}}, s: {{arrLogic2050.colPackage.service}})</td>
-                        <td>{{arrLogic3050.time}}(i: {{arrLogic3050.colPackage.info}}, s: {{arrLogic3050.colPackage.service}})</td>
-                        <td>{{arrDatagram1050.time}}(i: {{arrDatagram1050.colPackage.info}}, s: {{arrDatagram1050.colPackage.service}})</td>
-                        <td>{{arrDatagram2050.time}}(i: {{arrDatagram2050.colPackage.info}}, s: {{arrDatagram2050.colPackage.service}})</td>
-                        <td>{{arrDatagram3050.time}}(i: {{arrDatagram3050.colPackage.info}}, s: {{arrDatagram3050.colPackage.service}})</td>
+                        <td>{{arrLogic1050.time}}(i: {{arrLogic1050.colPackage.info}}, s:
+                            {{arrLogic1050.colPackage.service}})
+                        </td>
+                        <td>{{arrLogic2050.time}}(i: {{arrLogic2050.colPackage.info}}, s:
+                            {{arrLogic2050.colPackage.service}})
+                        </td>
+                        <td>{{arrLogic3050.time}}(i: {{arrLogic3050.colPackage.info}}, s:
+                            {{arrLogic3050.colPackage.service}})
+                        </td>
+                        <td>{{arrDatagram1050.time}}(i: {{arrDatagram1050.colPackage.info}}, s:
+                            {{arrDatagram1050.colPackage.service}})
+                        </td>
+                        <td>{{arrDatagram2050.time}}(i: {{arrDatagram2050.colPackage.info}}, s:
+                            {{arrDatagram2050.colPackage.service}})
+                        </td>
+                        <td>{{arrDatagram3050.time}}(i: {{arrDatagram3050.colPackage.info}}, s:
+                            {{arrDatagram3050.colPackage.service}})
+                        </td>
 
                     </tr>
                     {{/each}}
@@ -298,7 +320,7 @@
 
 </div>
 
-<div class="js-modal-table-time modal fade" tabindex="-1" role="dialog">
+<div class="js-modal-table-time  modal fade" tabindex="-1" role="dialog">
 
 </div>
 </body>

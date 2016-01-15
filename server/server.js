@@ -143,9 +143,9 @@ app.post('/add/link', function (req, res) {
                 "weight": parseInt(req.body.weight),
                 "isDuplex": req.body.type,
                 "id": linkId
-            }
+            };
             tmp.absoluteWeight = (tmp.isDuplex == 1) ? tmp.weight * 2 : tmp.weight;
-            console.log(tmp.absoluteWeight);
+
             json.links.push(tmp);
             jsonfile.writeFile(pathJsonFile, json, function (err) {
                 if (err) res.statusCode = 404;
@@ -177,7 +177,7 @@ app.post('/remove/link', function (req, res) {
         var target = global.getNumberNodeByName(obj.nodes, req.body.target);
         var source = global.getNumberNodeByName(obj.nodes, req.body.source);
         var numberLink = global.getNumberLinkByTrgAndSrc(obj.links, target, source);
-        console.log(numberLink);
+
         if (numberLink != -1) {
             obj.links.splice(numberLink, 1);
             jsonfile.writeFile(pathJsonFile, obj, function (err) {
@@ -242,10 +242,12 @@ app.post('/link/parameters', function (req, res) {
                 if (obj.links[i].id == idLink) {
                     link = obj.links[i];
                 }
-            }
-            ;
+            };
 
-            link.isDuplex = req.body["type"];
+            link.isDuplex = parseInt(req.body["type"]);
+            link.weight = req.body["weightLink"];
+            link.absoluteWeight = (link.isDuplex == 1) ? link.weight * 2 : link.weight;
+
             jsonfile.writeFile(pathJsonFile, obj, function (err) {
                 if (err) res.statusCode = 404;
                 //возвращаем на клиет весь джсон

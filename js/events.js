@@ -172,7 +172,8 @@ addEventListener("DOMContentLoaded", function () {
         saveGraphOnSever();
     });
 
-    $svg.on('dblclick', '.node', function () {
+    $svg.on('contextmenu', '.node', function (e) {
+        e.preventDefault();
         var idNode = $(this).data('id'),
             nodeName = $(this).data('name'),
             $modalNodeParam = $('.js-modal-node-parameters'),
@@ -189,18 +190,29 @@ addEventListener("DOMContentLoaded", function () {
     //    .data('title', 'Popover title')
     //    .data('content', "And here's some amazing content. It's very engaging. Right?").popover();
 
-    $svg.on('click', '.link', function () {
+    $svg.on('contextmenu', '.link', function (e) {
+        e.preventDefault();
         var $this = $(this),
             $modalParamLinks = $('.js-modal-link-parameters'),
             idLink = $(this).data('id'),
             link = getLinkById(idLink);
 
+        var arrTmp = [];
+
+        inputData.weights.forEach(function (elem, index) {
+            var selected = (parseInt(link.weight) == elem) ? "selected" : "";
+            arrTmp.push({value: elem, selected: selected});
+        });
+        console.log(arrTmp);
+
         var newVar = {
             linkName: link.source.name + ' - ' + link.target.name,
             idLink: idLink,
-            isDuplex: link.isDuplex,
-            isHalfDuplex: link.isDuplex ? 0 : 1
+            isDuplex: (link.isDuplex == "1") ? 1 : 0,
+            isHalfDuplex: (link.isDuplex == "0") ? 1 : 0,
+            selectData: arrTmp
         };
+        console.log(newVar);
         $modalParamLinks.empty().append(global.templates["js-modal-link-parameters"](newVar));
         $modalParamLinks.modal('toggle');
     });
@@ -222,9 +234,9 @@ addEventListener("DOMContentLoaded", function () {
 
         shortestPathes.routesArray.forEach(function (elem, index) {
             arr[index] = {
-                index : index,
-                shortestPath : shortestPathes.searchTable[index],
-                path : shortestPathes.routesArray[index]['route'].join(' -> ')
+                index: index,
+                shortestPath: shortestPathes.searchTable[index],
+                path: shortestPathes.routesArray[index]['route'].join(' -> ')
 
             }
         });
@@ -262,7 +274,7 @@ addEventListener("DOMContentLoaded", function () {
         var tmpObj = {};
         var weightPaths = searchShortestPathes(node.name, global.graph.nodes.length, global.graph.graphMatrix).searchTable;
         //переганяем в удобный вид для шаблонизатора.
-        matrixForTableTime[0].forEach(function (elem,index) {
+        matrixForTableTime[0].forEach(function (elem, index) {
             tmpObj[index] = {};
             var tmp = tmpObj[index];
             tmp.nodeName = index;
